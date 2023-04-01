@@ -7,6 +7,7 @@ message (STATUS "[${PROJECT_NAME}] Processing ${CMAKE_CURRENT_LIST_FILE}")
 set (SAMPLE_TARGET_NAME ${PROJECT_NAME})
 set (CMAKE_SCRIPTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/_cmake_scripts" CACHE STRING "The path of the cmake scripts directory.")
 set (SAMPLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/output/bin")
+set (APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/appicon.rc")
 
 include (${CMAKE_SCRIPTS_PATH}/cmake_detect_architecture.cmake)
 detect_target_architecture (ARCH)
@@ -33,6 +34,7 @@ add_executable (${SAMPLE_TARGET_NAME} ${SAMPLE_TARGET_DEFINITION_ADDENDUM}
     src/mytcpsocket.cpp
     src/mytcpsocket.h
     include/ARC/error_def.h
+    ${APP_ICON_RESOURCE_WINDOWS}
 )
 
 target_include_directories(${SAMPLE_TARGET_NAME} PRIVATE

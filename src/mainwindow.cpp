@@ -66,7 +66,7 @@ void MainWindow::pbClient_released()
    return;
 }
 
-ARCCode_t SendRecJoint(Robot* robot)
+ARCCode_t MainWindow::SendRecJoint(Robot* robot)
 {
    MyTcpSocket s;
    Array<double, 6, 1> j;
