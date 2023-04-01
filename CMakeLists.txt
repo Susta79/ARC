@@ -19,24 +19,30 @@ if (MSVC)
 endif ()
 
 add_executable (${SAMPLE_TARGET_NAME} ${SAMPLE_TARGET_DEFINITION_ADDENDUM} 
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    joint.cpp
-    joint.h
-    robot.cpp
-    robot.h
-    link.cpp
-    link.h
-    pose.cpp
-    pose.h
-    mytcpsocket.cpp
-    mytcpsocket.h
-    error_def.h
+    src/main.cpp
+    src/mainwindow.cpp
+    src/mainwindow.h
+    src/joint.cpp
+    src/joint.h
+    src/robot.cpp
+    src/robot.h
+    src/link.cpp
+    src/link.h
+    src/pose.cpp
+    src/pose.h
+    src/mytcpsocket.cpp
+    src/mytcpsocket.h
+    include/ARC/error_def.h
 )
 
-target_include_directories (${SAMPLE_TARGET_NAME}
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+target_include_directories(${SAMPLE_TARGET_NAME} PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${SAMPLE_TARGET_NAME}>
+    $<INSTALL_INTERFACE:include/${SAMPLE_TARGET_NAME}>
+)
+
+target_include_directories(${SAMPLE_TARGET_NAME} PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
 )
 
 find_package (Threads REQUIRED)

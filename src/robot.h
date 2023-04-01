@@ -13,7 +13,7 @@
 #include "joint.h"
 #include "link.h"
 #include "pose.h"
-#include "error_def.h"
+#include <ARC/error_def.h>
 
 using namespace Eigen;
 
