@@ -7,8 +7,6 @@
 #include <QFormLayout>
 #include <QHBoxLayout>
 
-//#include <stdio.h>
-//#include <iostream>
 #include <Eigen/Dense>
 
 using namespace Eigen;
@@ -18,11 +16,13 @@ using namespace Eigen;
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
    this->pRobot = new Robot("Robot1");
+   this->pTcpClient = new TcpClient();
    this->pbClient = new QPushButton("Client");
 
    QVBoxLayout *vBoxLayout = new QVBoxLayout();
    vBoxLayout->addWidget(this->pRobot->gbGroup);
    vBoxLayout->addWidget(this->pbClient);
+   vBoxLayout->addWidget(this->pTcpClient->gbGroup);
 
    QWidget *windowMS = new QWidget();
    windowMS->setLayout(vBoxLayout);

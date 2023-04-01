@@ -1,10 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-//#include <map>
-
 #include "joint.h"
 #include "robot.h"
+#include "tcpclient.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -29,6 +28,7 @@ private slots:
 
 private:
     Robot* pRobot;
+    TcpClient* pTcpClient;
     QTimer* tmr;
     QPushButton *pbClient;
     ARCCode_t SendRecJoint(Robot*);

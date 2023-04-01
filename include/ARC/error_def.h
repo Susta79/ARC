@@ -300,7 +300,7 @@ typedef uint32_t ARCError_t;
 #define ARC_COMPONENT_GENERAL      0x0000u
 #define ARC_COMPONENT_SYSTEM       0x0100u ///< System errors pertain to the vision system and its state machine.
 #define ARC_COMPONENT_KINEMATIC    0x0200u ///< Kinematic errors pertain to the kinematic of the robot (FK & IK).
-//#define ARC_COMPONENT_COMMUNICATOR 0x0400u ///< Communicator errors pertain to the framework for loading and running plug-ins.
+#define ARC_COMPONENT_COMMUNICATOR 0x0400u ///< Communicator errors pertain to the framework for loading and running plug-ins.
 //#define ARC_COMPONENT_PLUGIN       0x0800u ///< Plug-in errors are plug-in specific.
 #define ARC_COMPONENT_MASK         0x0F00u ///< Bit mask to extract the component from an error code.
 /**
