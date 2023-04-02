@@ -69,13 +69,14 @@ public:
     //void printAffine3d(Affine3d p);
     Affine3d FK(Array<double, 6, 1>);
     // IK: return the joint value 
-    Array<double, 6, 1> IK(Affine3d p, Array<double, 6, 1> joint_act);
+    //Array<double, 6, 1> IK(Affine3d p, Array<double, 6, 1> joint_act);
     // Inverse kinematics IK: from pose to joint values.
     // paramenters:
     //      pose: desired robot pose
     //      joint: set the actual joint values and get the new values as output
     // 
     ARCCode_t IK(Affine3d p, Robot::FrontBack fb, Robot::UpDown ud, Robot::PosNeg pn, Array<double, 6, 1>& joint);
+    ARCCode_t IK_2(Affine3d p, Array<double, 6, 1>& joint);
     //Joint IK(Affine3d p, Affine3d UT, Affine3d UF, Joint jAct, FrontBack FB, UpDown UD, PositiveNegative PN);
 };
 

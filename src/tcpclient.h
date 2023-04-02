@@ -2,6 +2,7 @@
 #define TCPCLIENT_H
 
 #include "error_def.h"
+#include "joint.h"
 
 #include <QObject>
 #include <QTcpSocket>
@@ -20,6 +21,8 @@ public:
     explicit TcpClient(QObject *parent = 0);
     ~TcpClient();
     QGroupBox *gbGroup;
+    Joint* pCmdJoint;
+    Joint* pActJoint;
 
 signals:
 

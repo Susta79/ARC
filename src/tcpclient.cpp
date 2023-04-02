@@ -47,13 +47,22 @@ TcpClient::TcpClient(QObject *parent) : QObject(parent) {
     tmr = new QTimer(this);
     connect(tmr, &QTimer::timeout, this, &TcpClient::tmr_timeout);
 
+    this->pCmdJoint = new Joint("Cmd");
+    this->pActJoint = new Joint("Act");
+
     // Group Main
     this->gbGroup = new QGroupBox("TcpClient");
     QHBoxLayout *layoutGroup = new QHBoxLayout();
-    layoutGroup->addWidget(this->leIP);
-    layoutGroup->addWidget(this->sbPort);
-    layoutGroup->addWidget(this->pbConnDisc);
-    layoutGroup->addWidget(this->pbSync);
+    layoutGroup->addWidget(this->pCmdJoint->gbJoints);
+    layoutGroup->addWidget(this->pActJoint->gbJoints);
+    QVBoxLayout *vBoxLayout = new QVBoxLayout();
+    vBoxLayout->addWidget(this->leIP);
+    vBoxLayout->addWidget(this->sbPort);
+    vBoxLayout->addWidget(this->pbConnDisc);
+    vBoxLayout->addWidget(this->pbSync);
+    QWidget *windowMS = new QWidget();
+    windowMS->setLayout(vBoxLayout);
+    layoutGroup->addWidget(windowMS);
     gbGroup->setLayout(layoutGroup);
 }
 
@@ -146,7 +155,10 @@ void TcpClient::pbSync_released() {
     }
 }
 
-ARCCode_t TcpClient::tmr_timeout(Array<double, 6, 1> joint_send, Array<double, 6, 1>& joint_rec) {
+void TcpClient::tmr_timeout() {
+    Array<double, 6, 1> joint_send = this->pCmdJoint->get_joints_deg();
+    Array<double, 6, 1> joint_rec;
+
     char str[64];
     sprintf_s(str, "%0007.3f %0007.3f %0007.3f %0007.3f %0007.3f %0007.3f\n", joint_send(0), joint_send(1), joint_send(2), joint_send(3), joint_send(4), joint_send(5));
     QTextStream(stdout) << str;
@@ -180,5 +192,7 @@ ARCCode_t TcpClient::tmr_timeout(Array<double, 6, 1> joint_send, Array<double, 6
         i++;
     }
 
-    return ARC_CODE_OK;
+    this->pActJoint->set_joints_deg(joint_rec);
+
+    return;
 }
