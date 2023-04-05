@@ -8,8 +8,9 @@
 
 #define VERSION "1.1.0"
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
+   this->pKinematic = new Kinematic(this);
    this->pRobot = new Robot("Robot1");
    this->pTcpClient = new TcpClient();
    this->pbKinematic = new QPushButton("Kinematic");
@@ -38,14 +39,17 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
 MainWindow::~MainWindow()
 {
-   if (pRobot)
-   {
+   if (pRobot) {
       delete pRobot;
       pRobot = nullptr;
+   }
+   if (pKinematic) {
+      delete pKinematic;
+      pKinematic = nullptr;
    }
 }
 
 void MainWindow::pbKinematic_clicked()
 {
-   return;
+   pKinematic->exec();
 }
