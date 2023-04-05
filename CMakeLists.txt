@@ -31,8 +31,8 @@ add_executable (${SAMPLE_TARGET_NAME} ${SAMPLE_TARGET_DEFINITION_ADDENDUM}
     src/link.h
     src/pose.cpp
     src/pose.h
-    src/mytcpsocket.cpp
-    src/mytcpsocket.h
+    src/kinematic.cpp
+    src/kinematic.h
     src/tcpclient.cpp
     src/tcpclient.h
     include/ARC/error_def.h

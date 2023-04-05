@@ -1,15 +1,10 @@
 #include "mainwindow.h"
-#include "joint.h"
-#include "mytcpsocket.h"
+#include "kinematic.h"
 
 #include <QMainWindow>
 #include <QWidget>
 #include <QFormLayout>
 #include <QHBoxLayout>
-
-#include <Eigen/Dense>
-
-using namespace Eigen;
 
 #define VERSION "1.1.0"
 
@@ -17,11 +12,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
    this->pRobot = new Robot("Robot1");
    this->pTcpClient = new TcpClient();
-   this->pbClient = new QPushButton("Client");
+   this->pbKinematic = new QPushButton("Kinematic");
 
    QVBoxLayout *vBoxLayout = new QVBoxLayout();
    vBoxLayout->addWidget(this->pRobot->gbGroup);
-   vBoxLayout->addWidget(this->pbClient);
+   vBoxLayout->addWidget(this->pbKinematic);
    vBoxLayout->addWidget(this->pTcpClient->gbGroup);
 
    QWidget *windowMS = new QWidget();
@@ -38,12 +33,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
    this->setWindowTitle(tr("ARC - V01"));
    this->move(10, 10);
 
-   tmr = new QTimer(this);
-   connect(tmr, SIGNAL(timeout()), this, SLOT(Timeout()));
-   //tmr->start(100);
-
-   connect(pbClient, &QPushButton::released, this, &MainWindow::pbClient_released);
-
+   connect(pbKinematic, &QPushButton::clicked, this, &MainWindow::pbKinematic_clicked);
 }
 
 MainWindow::~MainWindow()
@@ -55,23 +45,7 @@ MainWindow::~MainWindow()
    }
 }
 
-void MainWindow::Timeout()
+void MainWindow::pbKinematic_clicked()
 {
    return;
-}
-
-void MainWindow::pbClient_released()
-{
-   ARCCode_t code = SendRecJoint(this->pRobot);
-   return;
-}
-
-ARCCode_t MainWindow::SendRecJoint(Robot* robot)
-{
-   MyTcpSocket s;
-   Array<double, 6, 1> j;
-   ARCCode_t code = s.doConnect(robot->pJoint->get_joints_deg(), j);
-   if(code == ARC_CODE_OK)
-      robot->pRealJoint->set_joints_deg(j);
-   return code;
 }

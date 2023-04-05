@@ -3,8 +3,6 @@
 
 #include <QWidget>
 #include <QGroupBox>
-//#include <QCheckBox>
-//#include <QLabel>
 #include <QDoubleSpinBox>
 
 class Link

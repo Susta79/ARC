@@ -1,9 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "joint.h"
 #include "robot.h"
 #include "tcpclient.h"
+#include "kinematic.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -12,8 +12,6 @@
 #include <QWidget>
 #include <QGroupBox>
 #include <QStringList>
-#include <QCheckBox>
-#include <QTimer>
 
 class MainWindow : public QMainWindow
 {
@@ -24,17 +22,13 @@ public:
     ~MainWindow();
 
 private slots:
-    void pbClient_released();
+    void pbKinematic_clicked();
 
 private:
+    Kinematic* pKinematic;
     Robot* pRobot;
     TcpClient* pTcpClient;
-    QTimer* tmr;
-    QPushButton *pbClient;
-    ARCCode_t SendRecJoint(Robot*);
-
-public slots:
-    void Timeout();
+    QPushButton *pbKinematic;
 };
 
 #endif // MAINWINDOW_H
