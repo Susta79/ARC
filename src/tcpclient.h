@@ -1,7 +1,7 @@
 #ifndef TCPCLIENT_H
 #define TCPCLIENT_H
 
-#include "error_def.h"
+#include "include/ARC/error_def.h"
 #include "joint.h"
 
 #include <QObject>
@@ -41,6 +41,8 @@ private:
     QTimer* tmr;
     ARCCode_t Connect(QString IP, int Port);
     ARCCode_t Disconnect();
+    std::string format_joints_string_deg(Array<double, 6, 1>);
+    Array<double, 6, 1> parse_joints_string_deg(std::string);
 };
 
 #endif // TCPCLIENT_H

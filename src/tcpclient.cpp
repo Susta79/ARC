@@ -1,14 +1,19 @@
 #include "tcpclient.h"
-#include "error_def.h"
+#include "include/ARC/error_def.h"
 
 #include <QGroupBox>
 #include <QFormLayout>
-#include <QRegExpValidator>
+//#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 #include <QTimer>
 #include <Eigen/Dense>
 #include <iostream>
-#include <string.h>
+//#include <string.h>
 #include <stdio.h>
+#include <string>
+#include <sstream>
+#include <iomanip>
+//#include <vector>
 
 using namespace Eigen;
 using Eigen::MatrixXd;
@@ -30,11 +35,11 @@ TcpClient::TcpClient(QObject *parent) : QObject(parent) {
     // QLineEdit leIP
     this->leIP = new QLineEdit();
     QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
-    QRegExp ipRegex ("^" + ipRange
-                    + "\\." + ipRange
-                    + "\\." + ipRange
-                    + "\\." + ipRange + "$");
-    QRegExpValidator *ipValidator = new QRegExpValidator(ipRegex, this);
+    QRegularExpression ipRegex ("^" + ipRange
+                                 + "\\." + ipRange
+                                 + "\\." + ipRange
+                                 + "\\." + ipRange + "$");
+    QRegularExpressionValidator *ipValidator = new QRegularExpressionValidator(ipRegex, this);             
     this->leIP->setValidator(ipValidator);
     this->leIP->setText("127.0.0.1");
 
@@ -159,12 +164,13 @@ void TcpClient::tmr_timeout() {
     Array<double, 6, 1> joint_send = this->pCmdJoint->get_joints_deg();
     Array<double, 6, 1> joint_rec;
 
-    char str[64];
-    sprintf_s(str, "%0007.3f %0007.3f %0007.3f %0007.3f %0007.3f %0007.3f\n", joint_send(0), joint_send(1), joint_send(2), joint_send(3), joint_send(4), joint_send(5));
-    QTextStream(stdout) << str;
+    //char str[64];
+    std::string str = this->format_joints_string_deg(joint_send);
+    //sprintf_s(str, "%0007.3f %0007.3f %0007.3f %0007.3f %0007.3f %0007.3f\n", joint_send(0), joint_send(1), joint_send(2), joint_send(3), joint_send(4), joint_send(5));
+    QTextStream(stdout) << str.c_str();
 
     // send
-    socket->write(str);
+    socket->write(str.c_str());
     socket->waitForBytesWritten(1000);
     socket->waitForReadyRead(3000);
     
@@ -174,7 +180,9 @@ void TcpClient::tmr_timeout() {
     QByteArray reply = socket->readAll();
     qDebug() << reply;
     char *s = reply.data();
+    std::string str_reply_data(s); 
     
+    /*
     char seps[] = " ";
     char *token = NULL;
     char *next_token = NULL;
@@ -191,8 +199,38 @@ void TcpClient::tmr_timeout() {
         token = strtok_s(NULL, seps, &next_token);
         i++;
     }
+    */
 
+    joint_rec = this->parse_joints_string_deg(str_reply_data);
     this->pActJoint->set_joints_deg(joint_rec);
 
     return;
+}
+
+std::string TcpClient::format_joints_string_deg(Array<double, 6, 1> joints) {
+    std::ostringstream oss;
+
+    oss << std::fixed << std::setprecision(3);
+    oss << std::setw(7) << std::setfill('0') << joints[0] << " ";
+    oss << std::setw(7) << std::setfill('0') << joints[1] << " ";
+    oss << std::setw(7) << std::setfill('0') << joints[2] << " ";
+    oss << std::setw(7) << std::setfill('0') << joints[3] << " ";
+    oss << std::setw(7) << std::setfill('0') << joints[4] << " ";
+    oss << std::setw(7) << std::setfill('0') << joints[5] << "\n";
+
+    return oss.str();
+}
+
+Array<double, 6, 1> TcpClient::parse_joints_string_deg(std::string joints_string_deg) {
+    std::istringstream iss(joints_string_deg);
+    std::string token;
+    int iCounter = 0;
+    Array<double, 6, 1> joint_rec;
+
+    while (iss >> token) {
+        joint_rec(iCounter) = std::stod(token);
+        iCounter++;
+    }
+
+    return joint_rec;
 }

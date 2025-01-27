@@ -1,192 +1,111 @@
-cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
+##
+##  CMakeLists.txt
+##  qt-cmake-vscode
+##
+##  Created by Gino Bollaert on 04/10/2022.
+##
 
-project ("ARC")
+cmake_minimum_required(VERSION 3.22)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include(AppInfo)
+include(Qt)
 
-message (STATUS "[${PROJECT_NAME}] Processing ${CMAKE_CURRENT_LIST_FILE}")
-
-set (SAMPLE_TARGET_NAME ${PROJECT_NAME})
-set (CMAKE_SCRIPTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/_cmake_scripts" CACHE STRING "The path of the cmake scripts directory.")
-set (SAMPLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/output/bin")
-set (APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/appicon.rc")
-
-include (${CMAKE_SCRIPTS_PATH}/cmake_detect_architecture.cmake)
-detect_target_architecture (ARCH)
-
-set (CMAKE_AUTOMOC TRUE)
-set (CMAKE_AUTORCC TRUE)
-
-if (MSVC)
-    set (SAMPLE_TARGET_DEFINITION_ADDENDUM WIN32)
-endif ()
-
-add_executable (${SAMPLE_TARGET_NAME} ${SAMPLE_TARGET_DEFINITION_ADDENDUM} 
-    src/main.cpp
-    src/mainwindow.cpp
-    src/mainwindow.h
-    src/joint.cpp
-    src/joint.h
-    src/robot.cpp
-    src/robot.h
-    src/link.cpp
-    src/link.h
-    src/pose.cpp
-    src/pose.h
-    src/kinematic.cpp
-    src/kinematic.h
-    src/tcpclient.cpp
-    src/tcpclient.h
-    include/ARC/error_def.h
-    ${APP_ICON_RESOURCE_WINDOWS}
-)
-
-target_include_directories(${SAMPLE_TARGET_NAME} PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${SAMPLE_TARGET_NAME}>
-    $<INSTALL_INTERFACE:include/${SAMPLE_TARGET_NAME}>
-)
-
-target_include_directories(${SAMPLE_TARGET_NAME} PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
-
-find_package (Threads REQUIRED)
-
-find_package (Qt5 COMPONENTS Widgets Core Gui Network REQUIRED)
-set(QT_INSTALL_PREFIX "${_qt5Core_install_prefix}")
-
-find_package (Eigen3 3.3 REQUIRED NO_MODULE)
-
-target_link_libraries (${SAMPLE_TARGET_NAME}
-    ${CMAKE_THREAD_LIBS_INIT}
-    Qt5::Widgets
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Network
-    Eigen3::Eigen
-)
-
-if ((CMAKE_CXX_COMPILER_ID MATCHES "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
-    target_link_libraries (${SAMPLE_TARGET_NAME}
-        atomic
-    )
-endif ()
-
-# Set output directories for all configuration types (Debug, Release, etc.)
-if (NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE "Debug")
+string(REPLACE " " "_" PROJ_NAME ${APP_NAME})
+project(${PROJ_NAME} VERSION ${APP_VERSION})
+set(TARGET_NAME ${PROJ_NAME})
+if (NOT PROJECT_VERSION_PATCH)
+    set(PROJECT_VERSION_PATCH 0)
 endif()
-if (NOT CMAKE_CONFIGURATION_TYPES)
-    set (CMAKE_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE})
-endif ()
-if (CMAKE_CONFIGURATION_TYPES)
-    foreach (CONFIGURATION_TYPE ${CMAKE_CONFIGURATION_TYPES})
-        string (TOUPPER ${CONFIGURATION_TYPE} CONFIGURATION_TYPE_UPPER)
-        if (CONFIGURATION_TYPE_UPPER STREQUAL "RELEASE")
-            set (SAMPLE_RUNTIME_OUTPUT_NAME ${SAMPLE_TARGET_NAME})
-            set (SAMPLE_RUNTIME_OUTPUT_DIRECTORY ${SAMPLE_OUTPUT_PATH}/${ARCH})
-        else ()
-            string (TOLOWER ${CONFIGURATION_TYPE} CONFIGURATION_TYPE_LOWER)
-            set (SAMPLE_RUNTIME_OUTPUT_NAME "${SAMPLE_TARGET_NAME}_${CONFIGURATION_TYPE_LOWER}")
-            set (SAMPLE_RUNTIME_OUTPUT_DIRECTORY ${SAMPLE_OUTPUT_PATH}/${ARCH}/${CONFIGURATION_TYPE})
-        endif ()
-        set_target_properties (${SAMPLE_TARGET_NAME} PROPERTIES
-            RUNTIME_OUTPUT_NAME_${CONFIGURATION_TYPE_UPPER} ${SAMPLE_RUNTIME_OUTPUT_NAME}
-            RUNTIME_OUTPUT_DIRECTORY_${CONFIGURATION_TYPE_UPPER} ${SAMPLE_RUNTIME_OUTPUT_DIRECTORY}
-        )
-        message (STATUS "[${PROJECT_NAME}] Cfg ${CONFIGURATION_TYPE} -> Output directory: ${SAMPLE_RUNTIME_OUTPUT_DIRECTORY}, Output name: ${SAMPLE_RUNTIME_OUTPUT_NAME}")
-    endforeach ()
-endif ()
-
-if ((CMAKE_CXX_COMPILER_ID MATCHES GNU) OR (CMAKE_CXX_COMPILER_ID MATCHES Clang))
-    # ignore errors in headers from qt widgets include directories
-    foreach (INCLUDE_DIR ${Qt5Widgets_INCLUDE_DIRS})
-        if (NOT "${INCLUDE_DIR}" STREQUAL "/usr/include")
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -isystem ${INCLUDE_DIR}")
-        endif ()
-    endforeach ()
-endif ()
-
-set_target_properties(${SAMPLE_TARGET_NAME} PROPERTIES
-    CXX_STANDARD 14
-    CXX_STANDARD_REQUIRED ON
-    CXX_EXTENSIONS NO
-)
-
-if (MSVC)
-    target_compile_options (${SAMPLE_TARGET_NAME}
-        PRIVATE "/bigobj"
-        PRIVATE "/MP"
-    )
-endif ()
-
-GET_PROPERTY(${LIBRARY_NAME_UPPER_VISION_API}_LIBRARIES_COPIED_LOCAL GLOBAL PROPERTY ${LIBRARY_NAME_UPPER_VISION_API}_LIBRARIES_COPIED)
-if(NOT ${LIBRARY_NAME_UPPER_VISION_API}_LIBRARIES_COPIED_LOCAL)
-    file (GLOB ids_peak_LIBS
-        "${${LIBRARY_NAME_UPPER_VISION_API}_LIBRARY_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    )
-    foreach (ids_peak_LIBRARY ${ids_peak_LIBS})
-        message (STATUS "[${PROJECT_NAME}] Add PostBuildStep for copy of ${ids_peak_LIBRARY}.")
-        add_custom_command (TARGET ${SAMPLE_TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${ids_peak_LIBRARY}
-            $<TARGET_FILE_DIR:${SAMPLE_TARGET_NAME}>
-            COMMENT "Post build copy of ${ids_peak_LIBRARY} to output dir." VERBATIM
-        )
-    endforeach ()
-    SET_PROPERTY(GLOBAL PROPERTY ${LIBRARY_NAME_UPPER_VISION_API}_LIBRARIES_COPIED ON)
+if (NOT PROJECT_VERSION_TWEAK)
+    set(PROJECT_VERSION_TWEAK 0)
 endif()
 
-GET_PROPERTY(${LIBRARY_NAME_LIBIMG_UPPER}_LIBRARIES_COPIED_LOCAL GLOBAL PROPERTY ${LIBRARY_NAME_LIBIMG_UPPER}_LIBRARIES_COPIED)
-if(NOT ${LIBRARY_NAME_LIBIMG_UPPER}_LIBRARIES_COPIED_LOCAL)
-    file (GLOB ids_peak_ipl_LIBS
-        "${${LIBRARY_NAME_LIBIMG_UPPER}_LIBRARY_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}"
+set(CMAKE_OSX_ARCHITECTURES arm64 x86_64)
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15")
+
+if (APPLE)
+    set(ICON_FILE resources/${ICON_NAME}.icns)
+    set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set(MACOSX_BUNDLE_BUNDLE_NAME ${APP_NAME})
+    set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+    set(MACOSX_BUNDLE_LONG_VERSION_STRING ${PROJECT_VERSION})
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
+    set(MACOSX_BUNDLE_COPYRIGHT ${COPYRIGHT})
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER ${IDENTIFIER})
+    set(MACOSX_BUNDLE_ICON_FILE ${ICON_NAME}.icns)
+    set(RESOURCE_FILES
+        resources/resources.qrc
+        ${ICON_FILE}
     )
-    foreach (ids_peak_ipl_LIBRARY ${ids_peak_ipl_LIBS})
-        message (STATUS "[${PROJECT_NAME}] Add PostBuildStep for copy of ${ids_peak_ipl_LIBRARY}.")
-        add_custom_command (TARGET ${SAMPLE_TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${ids_peak_ipl_LIBRARY}
-            $<TARGET_FILE_DIR:${SAMPLE_TARGET_NAME}>
-            COMMENT "Post build copy of ${ids_peak_ipl_LIBRARY} to output dir." VERBATIM
-        )
-    endforeach ()
-    SET_PROPERTY(GLOBAL PROPERTY ${LIBRARY_NAME_LIBIMG_UPPER}_LIBRARIES_COPIED ON)
+elseif (WIN32)
+    enable_language(RC)
+    set(ICON_FILE resources/${ICON_NAME}.ico)
+    configure_file(${CMAKE_SOURCE_DIR}/windows/resources.rc.in resources.rc @ONLY)
+    set(RESOURCE_FILES
+        resources/resources.qrc
+        resources.rc
+    )
 endif()
 
-if (WIN32)
-    # copy qt libraries to the output folder
-    message (STATUS "[${PROJECT_NAME}] Add PostBuildStep for copy of the Qt libs. ${QT_INSTALL_PREFIX}")
-    add_custom_command (TARGET ${SAMPLE_TARGET_NAME} POST_BUILD
-        COMMAND "${QT_INSTALL_PREFIX}/bin/windeployqt"
-                $<$<CONFIG:Debug>:--debug>$<$<NOT:$<CONFIG:Debug>>:--release>
-                --no-quick-import
-                --no-translations
-                --no-system-d3d-compiler
-                --no-webkit2
-                --no-angle
-                --no-opengl-sw
-                --no-svg
-                --dir $<TARGET_FILE_DIR:${SAMPLE_TARGET_NAME}>
-                $<TARGET_FILE:${SAMPLE_TARGET_NAME}>
-    )
-endif ()
+set(CMAKE_PREFIX_PATH ${QT6_DIR})
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
+include_directories(${QT6_DIR}/lib)
 
-# For unix Build we need the environment variable GENICAM_GENTL32_PATH respectivily GENICAM_GENTL64_PATH to find the GenTL producer libraries.
-# To set these environment variables a shell script is used wich can be found in the samples root folder in _cmake_scripts.
-# To run the samples run this script not the binary.
-if (UNIX)
-    string (TOLOWER ${CMAKE_BUILD_TYPE} CONFIGURATION_TYPE_LOWER)
-    if(${CONFIGURATION_TYPE_LOWER} STREQUAL "release")
-        set(VSSL_SAMPLE_BINARY_NAME ${PROJECT_NAME})
-    else()
-        set(VSSL_SAMPLE_BINARY_NAME ${PROJECT_NAME}_${CONFIGURATION_TYPE_LOWER})
+find_package (Eigen3 3.4 REQUIRED NO_MODULE)
+
+qt_standard_project_setup()
+set(CMAKE_AUTORCC ON)
+
+add_executable(${TARGET_NAME} ${SOURCE_FILES} ${RESOURCE_FILES})
+foreach(LIB ${QT_COMPONENTS})
+    target_link_libraries(${TARGET_NAME} PRIVATE Qt6::${LIB})
+endforeach(LIB)
+
+target_link_libraries(${TARGET_NAME} PRIVATE Eigen3::Eigen)
+
+set_target_properties(${TARGET_NAME} PROPERTIES
+    WIN32_EXECUTABLE ON
+    MACOSX_BUNDLE ON
+    XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME YES
+)
+
+set(BUILD_DIR ${PROJECT_SOURCE_DIR}/build)
+
+file(COPY ${QT6_DIR}/../../Licenses/LICENSE DESTINATION ${BUILD_DIR})
+
+if (APPLE)
+    if (MACOSX_IS_AGENT)
+        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND /bin/bash ${CMAKE_SOURCE_DIR}/macos/plist-agent.sh ${BUILD_DIR}/${TARGET_NAME}.app/Contents/Info.plist
+        )
     endif()
-    configure_file(${CMAKE_SCRIPTS_PATH}/sample_starter.in ${CMAKE_CURRENT_BINARY_DIR}/${VSSL_SAMPLE_BINARY_NAME}.sh)
-    file(COPY ${CMAKE_CURRENT_BINARY_DIR}/${VSSL_SAMPLE_BINARY_NAME}.sh
-        DESTINATION ${SAMPLE_RUNTIME_OUTPUT_DIRECTORY}
-        FILE_PERMISSIONS
-            OWNER_READ OWNER_WRITE OWNER_EXECUTE
-            GROUP_READ GROUP_EXECUTE
-            WORLD_READ WORLD_EXECUTE
+elseif(WIN32)
+    # We need the DLLs normally copied during deployment in order to debug in VSCode
+    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+        COMMAND ${QT6_DIR}/bin/windeployqt.exe ${BUILD_DIR}/${TARGET_NAME}.exe
     )
-endif (UNIX)
+endif()
+
+set(DIST_DIR ${BUILD_DIR}/dist)
+set(BUILT_APP ${BUILD_DIR}/${APP_NAME}.app)
+set(DIST_APP ${DIST_DIR}/${APP_NAME}.app)
+set(CMAKE_INSTALL_PREFIX ${DIST_DIR})
+
+if (APPLE)
+    configure_file(${CMAKE_SOURCE_DIR}/macos/notarize.sh.in notarize.sh @ONLY)
+    # Qt's deploy script is broken for Mac so run the command-line version instead
+    configure_file(${CMAKE_SOURCE_DIR}/macos/mac-deploy.sh.in mac-deploy.sh @ONLY)
+    install(SCRIPT ${CMAKE_SOURCE_DIR}/macos/PostInstall.cmake)
+elseif(WIN32)
+    install(TARGETS ${TARGET_NAME}
+        BUNDLE DESTINATION .
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+    qt_generate_deploy_app_script(
+        TARGET ${TARGET_NAME}
+        FILENAME_VARIABLE deploy_script
+        NO_UNSUPPORTED_PLATFORM_ERROR
+    )
+    install(SCRIPT ${deploy_script})
+endif()

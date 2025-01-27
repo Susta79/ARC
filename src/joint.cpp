@@ -1,8 +1,10 @@
-#include "joint.h"
+#include <QWidget>
 
 #include <QGroupBox>
 #include <QFormLayout>
 #include <QLabel>
+
+#include "joint.h"
 
 Joint::Joint(QString n){
     this->name = n;
