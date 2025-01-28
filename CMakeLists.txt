@@ -1,10 +1,3 @@
-##
-##  CMakeLists.txt
-##  qt-cmake-vscode
-##
-##  Created by Gino Bollaert on 04/10/2022.
-##
-
 cmake_minimum_required(VERSION 3.22)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(AppInfo)
@@ -21,7 +14,8 @@ if (NOT PROJECT_VERSION_TWEAK)
 endif()
 
 set(CMAKE_OSX_ARCHITECTURES arm64 x86_64)
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15")
+#set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "42.0")
 
 if (APPLE)
     set(ICON_FILE resources/${ICON_NAME}.icns)
@@ -50,9 +44,12 @@ endif()
 set(CMAKE_PREFIX_PATH ${QT6_DIR})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
-include_directories(${QT6_DIR}/lib)
 
-find_package (Eigen3 3.4 REQUIRED NO_MODULE)
+include_directories(${QT6_DIR}/lib)
+include_directories(${QT6_DIR}/lib/QtWidtgets.framework/Version/Current/Headers)
+include_directories(include)
+
+find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 
 qt_standard_project_setup()
 set(CMAKE_AUTORCC ON)

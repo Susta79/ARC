@@ -1,17 +1,10 @@
-##
-##  AppInfo.cmake
-##  qt-cmake-vscode
-##
-##  Created by Gino Bollaert on 04/10/2022.
-##
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(APP_NAME "ARC")
 set(APP_VERSION 0.1.0)
 set(COMPANY FBC)
-set(IDENTIFIER com.fbc.qt-template)
+#set(IDENTIFIER com.fbc.qt-template)
 set(COPYRIGHT "Copyright (c) 2022 Fabrizio Bergamin. All rights reserved.")
 set(ICON_NAME arc_icon)
 set(MACOSX_IS_AGENT FALSE)

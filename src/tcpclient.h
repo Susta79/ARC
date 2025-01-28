@@ -1,6 +1,23 @@
 #ifndef TCPCLIENT_H
 #define TCPCLIENT_H
 
+#include "joint.h"
+#include "ARC/error_def.h"
+
+#include <QObject>
+#include <QTcpSocket>
+#include <QPushButton>
+#include <QLineEdit>
+#include <QSpinBox>
+#include <QTimer>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QTextStream>
+#include <QDebug>
+#include <QWidget>
+
+/*
 #include "include/ARC/error_def.h"
 #include "joint.h"
 
@@ -11,6 +28,8 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QSpinBox>
+*/
+
 #include <Eigen/Dense>
 
 using namespace Eigen;

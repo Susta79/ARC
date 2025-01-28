@@ -3,17 +3,14 @@
 
 #include <QGroupBox>
 #include <QFormLayout>
-//#include <QRegExpValidator>
 #include <QRegularExpressionValidator>
 #include <QTimer>
 #include <Eigen/Dense>
 #include <iostream>
-//#include <string.h>
 #include <stdio.h>
 #include <string>
 #include <sstream>
 #include <iomanip>
-//#include <vector>
 
 using namespace Eigen;
 using Eigen::MatrixXd;
