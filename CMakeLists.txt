@@ -51,8 +51,17 @@ include_directories(include)
 
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 
-qt_standard_project_setup()
+if(APPLE OR WIN32)
+    qt_standard_project_setup()
+endif()
+
 set(CMAKE_AUTORCC ON)
+
+# Instruct CMake to run moc automatically when needed.
+# Required to compile on Ubuntu 22.04
+if(UNIX)
+    set(CMAKE_AUTOMOC ON)
+endif()
 
 add_executable(${TARGET_NAME} ${SOURCE_FILES} ${RESOURCE_FILES})
 foreach(LIB ${QT_COMPONENTS})
@@ -69,7 +78,7 @@ set_target_properties(${TARGET_NAME} PROPERTIES
 
 set(BUILD_DIR ${PROJECT_SOURCE_DIR}/build)
 
-file(COPY ${QT6_DIR}/../../Licenses/LICENSE DESTINATION ${BUILD_DIR})
+#file(COPY ${QT6_DIR}/../../Licenses/LICENSE DESTINATION ${BUILD_DIR})
 
 if (APPLE)
     if (MACOSX_IS_AGENT)

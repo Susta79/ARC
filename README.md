@@ -1,18 +1,32 @@
 # ARC
 A Robot Controller
 
-To use Qt:
-Set the CMake tools extension "Configure Args" to -DCMAKE_PREFIX_PATH=C:/Qt/5.15.2/msvc2019_64
+This is obsolet:
+    To use Qt:
+    Set the CMake tools extension "Configure Args" to -DCMAKE_PREFIX_PATH=C:/Qt/5.15.2/msvc2019_64
 
+
+## Install Eigen
+
+### Windows
 To use Eigen:
 Install eigen using vcpkg. ".\vcpkg install eigen3:x64-windows"
 Set the CMake tools extension "Configure Args" to -DEigen3_DIR=C:/dev/vcpkg/packages/eigen3_x64-windows/share/eigen3
 
-## Install Eigen macos
+### macos
 After installing Homebrew, run the following command:
 brew install eigen
 at the end you will get the path where eigen is installed. In my case:
 /usr/local/Cellar/eigen/3.4.0_1
+
+## Troubleshooting
+
+### Linux Ubuntu 22.04
+I must unset the environment variable GTK_PATH to run the executable:
+you can print the actual value of the variable with: printenv GTK_PATH
+To unset the variable use: unset GTK_PATH
+The value of the variable before unset was: /snap/code/181/usr/lib/x86_64-linux-gnu/gtk-3.0 (maybe because of ROS2?)
+
 
 
 
