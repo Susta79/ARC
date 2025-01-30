@@ -13,6 +13,9 @@ To use Eigen:
 Install eigen using vcpkg. ".\vcpkg install eigen3:x64-windows"
 Set the CMake tools extension "Configure Args" to -DEigen3_DIR=C:/dev/vcpkg/packages/eigen3_x64-windows/share/eigen3
 
+You can also install Eigen with Chocolatey: choco install eigen
+
+
 ### macos
 After installing Homebrew, run the following command:
 brew install eigen

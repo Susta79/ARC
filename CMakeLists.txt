@@ -28,7 +28,6 @@ if (APPLE)
     set(MACOSX_BUNDLE_GUI_IDENTIFIER ${IDENTIFIER})
     set(MACOSX_BUNDLE_ICON_FILE ${ICON_NAME}.icns)
     set(RESOURCE_FILES
-        resources/resources.qrc
         ${ICON_FILE}
     )
 elseif (WIN32)
@@ -36,7 +35,6 @@ elseif (WIN32)
     set(ICON_FILE resources/${ICON_NAME}.ico)
     configure_file(${CMAKE_SOURCE_DIR}/windows/resources.rc.in resources.rc @ONLY)
     set(RESOURCE_FILES
-        resources/resources.qrc
         resources.rc
     )
 endif()
