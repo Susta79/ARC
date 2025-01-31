@@ -100,17 +100,13 @@ void Pose::Init(){
 Affine3d Pose::get_pose(){
     Affine3d p = Eigen::Affine3d::Identity();
     p.translation() = Eigen::Vector3d(this->dsbX->value(), this->dsbY->value(), this->dsbZ->value());
+    double sx = sin(this->dsbA->value() * M_PI / 180.0);
+    double cx = cos(this->dsbA->value() * M_PI / 180.0);
+    double sy = sin(this->dsbB->value() * M_PI / 180.0);
+    double cy = cos(this->dsbB->value() * M_PI / 180.0);
+    double sz = sin(this->dsbC->value() * M_PI / 180.0);
+    double cz = cos(this->dsbC->value() * M_PI / 180.0);
     Matrix3d rot;
-    double sx, cx, sy, cy, sz, cz;
-    //rot = AngleAxisd(this->dsbC->value() * M_PI / 180.0, Vector3d::UnitZ())
-    //    * AngleAxisd(this->dsbB->value() * M_PI / 180.0, Vector3d::UnitY())
-    //    * AngleAxisd(this->dsbA->value() * M_PI / 180.0, Vector3d::UnitX());
-    sx = sin(this->dsbA->value() * M_PI / 180.0);
-    cx = cos(this->dsbA->value() * M_PI / 180.0);
-    sy = sin(this->dsbB->value() * M_PI / 180.0);
-    cy = cos(this->dsbB->value() * M_PI / 180.0);
-    sz = sin(this->dsbC->value() * M_PI / 180.0);
-    cz = cos(this->dsbC->value() * M_PI / 180.0);
     rot(0,0) = cz*cy;
     rot(1,0) = sz*cy;
     rot(2,0) = -sy;
@@ -129,13 +125,8 @@ void Pose::set_pose(Affine3d m){
     this->dsbX->setValue(t.x());
     this->dsbY->setValue(t.y());
     this->dsbZ->setValue(t.z());
-    //Vector3d ea = m.linear().eulerAngles(0, 1, 2) * 180.0 / M_PI;
     Matrix3d rot;
     rot = m.linear();
-    //this->dsbA->setValue(ea(0));
-    //this->dsbB->setValue(ea(1));
-    //this->dsbC->setValue(ea(2));
-
     // R=Rz(C)*Ry(B)*Rx(A)
     // if cos(B) <> to 1 and -1
     if (rot(2,0)<0.999 || rot(2,0)>-0.999) {
@@ -168,7 +159,6 @@ void Pose::set_pose(Affine3d m){
         this->dsbB->setValue(B2 * 180.0 / M_PI);
         this->dsbC->setValue(C2 * 180.0 / M_PI);
     }
-    
     //qDebug() << "A1: " << A1 << "; A2: " << A2;
     //qDebug() << "B1: " << B1 << "; B2: " << B2;
     //qDebug() << "C1: " << C1 << "; C2: " << C2;

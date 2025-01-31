@@ -393,7 +393,7 @@ ARCCode_t Robot::IK_2(Affine3d p, Array<double, 6, 1>& joint){
             break;
     }*/
 
-    x_hat = MP.rotation() * Vector3d::UnitX();
+    x_hat = MP.linear() * Vector3d::UnitX();
     WP = MP.translation() - (this->pLink->get_a6x() * x_hat.normalized());
 
     // Find J1
