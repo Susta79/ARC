@@ -7,6 +7,8 @@
 #include <QWidget>
 #include <QGroupBox>
 #include <QDoubleSpinBox>
+#include <QFormLayout>
+#include <QLabel>
 #include <Eigen/Geometry>
 
 using namespace Eigen;

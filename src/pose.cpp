@@ -1,10 +1,5 @@
 #include "pose.h"
 
-#include <QGroupBox>
-#include <QFormLayout>
-#include <QLabel>
-#include <Eigen/Dense>
-
 Pose::Pose(){
     this->Init();
 }
@@ -106,9 +101,25 @@ Affine3d Pose::get_pose(){
     Affine3d p = Eigen::Affine3d::Identity();
     p.translation() = Eigen::Vector3d(this->dsbX->value(), this->dsbY->value(), this->dsbZ->value());
     Matrix3d rot;
-    rot = AngleAxisd(this->dsbC->value() * M_PI / 180.0, Vector3d::UnitZ())
-        * AngleAxisd(this->dsbB->value() * M_PI / 180.0, Vector3d::UnitY())
-        * AngleAxisd(this->dsbA->value() * M_PI / 180.0, Vector3d::UnitX());
+    double sx, cx, sy, cy, sz, cz;
+    //rot = AngleAxisd(this->dsbC->value() * M_PI / 180.0, Vector3d::UnitZ())
+    //    * AngleAxisd(this->dsbB->value() * M_PI / 180.0, Vector3d::UnitY())
+    //    * AngleAxisd(this->dsbA->value() * M_PI / 180.0, Vector3d::UnitX());
+    sx = sin(this->dsbA->value() * M_PI / 180.0);
+    cx = cos(this->dsbA->value() * M_PI / 180.0);
+    sy = sin(this->dsbB->value() * M_PI / 180.0);
+    cy = cos(this->dsbB->value() * M_PI / 180.0);
+    sz = sin(this->dsbC->value() * M_PI / 180.0);
+    cz = cos(this->dsbC->value() * M_PI / 180.0);
+    rot(0,0) = cz*cy;
+    rot(1,0) = sz*cy;
+    rot(2,0) = -sy;
+    rot(0,1) = cz*sy*sx-sz*cx;
+    rot(1,1) = cz*cx+sz*sy*sx;
+    rot(2,1) = cy*sx;
+    rot(0,2) = sz*sx+cz*sy*cx;
+    rot(1,2) = sz*sy*cx-cz*sx;
+    rot(2,2) = cy*cx;
     p.linear() = rot;
     return p;
 }
