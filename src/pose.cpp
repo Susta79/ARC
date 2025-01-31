@@ -1,12 +1,58 @@
 #include "pose.h"
 
 Pose::Pose(){
-    this->Init();
-}
+    // Group Links
+    this->dsbX = new QDoubleSpinBox;
+    this->dsbX->setRange(-9999.0, 9999.0);
+    this->dsbX->setSingleStep(1.0);
+    this->dsbX->setSuffix("mm");
+    this->dsbX->setValue(0.0);
+    this->dsbX->setDecimals(2);
 
-Pose::Pose(Affine3d m){
-    this->Init();
-    this->set_pose(m);
+    this->dsbY = new QDoubleSpinBox;
+    this->dsbY->setRange(-9999.0, 9999.0);
+    this->dsbY->setSingleStep(1.0);
+    this->dsbY->setSuffix("mm");
+    this->dsbY->setValue(0.0);
+    this->dsbY->setDecimals(2);
+
+    this->dsbZ = new QDoubleSpinBox;
+    this->dsbZ->setRange(-9999.0, 9999.0);
+    this->dsbZ->setSingleStep(1.0);
+    this->dsbZ->setSuffix("mm");
+    this->dsbZ->setValue(0.0);
+    this->dsbZ->setDecimals(2);
+
+    this->dsbA = new QDoubleSpinBox;
+    this->dsbA->setRange(-360.0, 360.0);
+    this->dsbA->setSingleStep(1.0);
+    this->dsbA->setSuffix("°");
+    this->dsbA->setValue(0.0);
+    this->dsbA->setDecimals(3);
+
+    this->dsbB = new QDoubleSpinBox;
+    this->dsbB->setRange(-360.0, 360.0);
+    this->dsbB->setSingleStep(1.0);
+    this->dsbB->setSuffix("°");
+    this->dsbB->setValue(0.0);
+    this->dsbB->setDecimals(3);
+
+    this->dsbC = new QDoubleSpinBox;
+    this->dsbC->setRange(-360.0, 360.0);
+    this->dsbC->setSingleStep(1.0);
+    this->dsbC->setSuffix("°");
+    this->dsbC->setValue(0.0);
+    this->dsbC->setDecimals(3);
+
+    this->gbPose = new QGroupBox("Pose");
+    QFormLayout *layoutJoints = new QFormLayout;
+    layoutJoints->addRow(new QLabel("X:"), dsbX);
+    layoutJoints->addRow(new QLabel("Y:"), dsbY);
+    layoutJoints->addRow(new QLabel("Z:"), dsbZ);
+    layoutJoints->addRow(new QLabel("A(RX):"), dsbA);
+    layoutJoints->addRow(new QLabel("B(RY):"), dsbB);
+    layoutJoints->addRow(new QLabel("C(RZ):"), dsbC);
+    this->gbPose->setLayout(layoutJoints);
 }
 
 Pose::~Pose(){
@@ -39,61 +85,6 @@ Pose::~Pose(){
         delete gbPose;
         gbPose = nullptr;
     }
-}
-
-void Pose::Init(){
-    // Group Links
-    this->dsbX = new QDoubleSpinBox;
-    this->dsbX->setRange(-9999.0, 9999.0);
-    this->dsbX->setSingleStep(1.0);
-    this->dsbX->setSuffix("mm");
-    this->dsbX->setValue(0.0);
-    this->dsbX->setDecimals(1);
-
-    this->dsbY = new QDoubleSpinBox;
-    this->dsbY->setRange(-9999.0, 9999.0);
-    this->dsbY->setSingleStep(1.0);
-    this->dsbY->setSuffix("mm");
-    this->dsbY->setValue(0.0);
-    this->dsbY->setDecimals(1);
-
-    this->dsbZ = new QDoubleSpinBox;
-    this->dsbZ->setRange(-9999.0, 9999.0);
-    this->dsbZ->setSingleStep(1.0);
-    this->dsbZ->setSuffix("mm");
-    this->dsbZ->setValue(0.0);
-    this->dsbZ->setDecimals(1);
-
-    this->dsbA = new QDoubleSpinBox;
-    this->dsbA->setRange(-360.0, 360.0);
-    this->dsbA->setSingleStep(1.0);
-    this->dsbA->setSuffix("°");
-    this->dsbA->setValue(0.0);
-    this->dsbA->setDecimals(2);
-
-    this->dsbB = new QDoubleSpinBox;
-    this->dsbB->setRange(-360.0, 360.0);
-    this->dsbB->setSingleStep(1.0);
-    this->dsbB->setSuffix("°");
-    this->dsbB->setValue(0.0);
-    this->dsbB->setDecimals(2);
-
-    this->dsbC = new QDoubleSpinBox;
-    this->dsbC->setRange(-360.0, 360.0);
-    this->dsbC->setSingleStep(1.0);
-    this->dsbC->setSuffix("°");
-    this->dsbC->setValue(0.0);
-    this->dsbC->setDecimals(2);
-
-    this->gbPose = new QGroupBox("Pose");
-    QFormLayout *layoutJoints = new QFormLayout;
-    layoutJoints->addRow(new QLabel("X:"), dsbX);
-    layoutJoints->addRow(new QLabel("Y:"), dsbY);
-    layoutJoints->addRow(new QLabel("Z:"), dsbZ);
-    layoutJoints->addRow(new QLabel("A(RX):"), dsbA);
-    layoutJoints->addRow(new QLabel("B(RY):"), dsbB);
-    layoutJoints->addRow(new QLabel("C(RZ):"), dsbC);
-    this->gbPose->setLayout(layoutJoints);
 }
 
 // pose

@@ -16,7 +16,11 @@ using namespace Eigen;
 class Pose
 {
 private:
+    // The quaternion is not used for the moment
     Quaterniond q = Quaterniond::Identity(); 
+    void Init();
+
+protected:
     // Group Pose
     // Translation
     QDoubleSpinBox *dsbX;
@@ -27,13 +31,11 @@ private:
     QDoubleSpinBox *dsbB; // B = rotation angle around Y
     QDoubleSpinBox *dsbC; // C = rotation angle around Z
 
-    void Init();
-
-public:
     QGroupBox *gbPose;
 
+public:
     Pose();
-    Pose(Affine3d);
+    //Pose(Affine3d);
     ~Pose();
 
     // pose

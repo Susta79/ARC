@@ -12,39 +12,45 @@ Joint::Joint(QString n){
     // Group Joints
     this->dsbJoint1 = new QDoubleSpinBox;
     this->dsbJoint1->setRange(-360.0, 360.0);
-    this->dsbJoint1->setSingleStep(0.01);
+    this->dsbJoint1->setSingleStep(1.0);
     this->dsbJoint1->setSuffix("°");
     this->dsbJoint1->setValue(0.0);
+    this->dsbJoint1->setDecimals(2);
 
     this->dsbJoint2 = new QDoubleSpinBox;
     this->dsbJoint2->setRange(-360.0, 360.0);
     this->dsbJoint2->setSingleStep(1.0);
     this->dsbJoint2->setSuffix("°");
     this->dsbJoint2->setValue(0.0);
+    this->dsbJoint2->setDecimals(2);
 
     this->dsbJoint3 = new QDoubleSpinBox;
     this->dsbJoint3->setRange(-360.0, 360.0);
     this->dsbJoint3->setSingleStep(1.0);
     this->dsbJoint3->setSuffix("°");
     this->dsbJoint3->setValue(0.0);
+    this->dsbJoint3->setDecimals(2);
 
     this->dsbJoint4 = new QDoubleSpinBox;
     this->dsbJoint4->setRange(-360.0, 360.0);
     this->dsbJoint4->setSingleStep(1.0);
     this->dsbJoint4->setSuffix("°");
     this->dsbJoint4->setValue(0.0);
+    this->dsbJoint4->setDecimals(2);
 
     this->dsbJoint5 = new QDoubleSpinBox;
     this->dsbJoint5->setRange(-360.0, 360.0);
     this->dsbJoint5->setSingleStep(1.0);
     this->dsbJoint5->setSuffix("°");
     this->dsbJoint5->setValue(0.0);
+    this->dsbJoint5->setDecimals(2);
 
     this->dsbJoint6 = new QDoubleSpinBox;
     this->dsbJoint6->setRange(-360.0, 360.0);
     this->dsbJoint6->setSingleStep(1.0);
     this->dsbJoint6->setSuffix("°");
     this->dsbJoint6->setValue(0.0);
+    this->dsbJoint6->setDecimals(2);
 
     this->gbJoints = new QGroupBox(this->name);
     QFormLayout *layoutJoints = new QFormLayout;
