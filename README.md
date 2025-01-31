@@ -1,6 +1,16 @@
 # ARC
 A Robot Controller
 
+## Angles
+Tait-Bryan angles:
+
+A = rotation angle around X
+B = rotation angle around Y
+C = rotation angle around Z
+
+R=Rz(C)*Ry(B)*Rx(A)
+
+
 This is obsolet:
     To use Qt:
     Set the CMake tools extension "Configure Args" to -DCMAKE_PREFIX_PATH=C:/Qt/5.15.2/msvc2019_64

@@ -16,12 +16,14 @@ class Pose
 private:
     Quaterniond q = Quaterniond::Identity(); 
     // Group Pose
+    // Translation
     QDoubleSpinBox *dsbX;
     QDoubleSpinBox *dsbY;
     QDoubleSpinBox *dsbZ;
-    QDoubleSpinBox *dsbA;
-    QDoubleSpinBox *dsbB;
-    QDoubleSpinBox *dsbC;
+    // Tait-Bryan angles:
+    QDoubleSpinBox *dsbA; // A = rotation angle around X
+    QDoubleSpinBox *dsbB; // B = rotation angle around Y
+    QDoubleSpinBox *dsbC; // C = rotation angle around Z
 
     void Init();
 
@@ -49,17 +51,22 @@ public:
     void set_z(double val);
 
     // a
-    double get_a();
-    void set_a(double val);
+    double get_a_deg();
+    double get_a_rad();
+    void set_a_deg(double val);
+    void set_a_rad(double val);
 
     // b
-    double get_b();
-    void set_b(double val);
+    double get_b_deg();
+    double get_b_rad();
+    void set_b_deg(double val);
+    void set_b_rad(double val);
 
     // c
-    double get_c();
-    void set_c(double val);
-
+    double get_c_deg();
+    double get_c_rad();
+    void set_c_deg(double val);
+    void set_c_rad(double val);
 };
 
 #endif // POSE_H
