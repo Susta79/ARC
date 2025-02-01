@@ -11,7 +11,7 @@ Joint::Joint(QString n){
 
     // Group Joints
     this->dsbJoint1 = new QDoubleSpinBox;
-    this->dsbJoint1->setRange(-360.0, 360.0);
+    this->dsbJoint1->setRange(-180.0, 180.0);
     this->dsbJoint1->setSingleStep(1.0);
     this->dsbJoint1->setSuffix("°");
     this->dsbJoint1->setValue(0.0);
@@ -39,7 +39,7 @@ Joint::Joint(QString n){
     this->dsbJoint4->setDecimals(2);
 
     this->dsbJoint5 = new QDoubleSpinBox;
-    this->dsbJoint5->setRange(-360.0, 360.0);
+    this->dsbJoint5->setRange(-179.9, 179.9);
     this->dsbJoint5->setSingleStep(1.0);
     this->dsbJoint5->setSuffix("°");
     this->dsbJoint5->setValue(0.0);
