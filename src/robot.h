@@ -26,23 +26,10 @@ private:
     QString name;
     QPushButton *pbFK;
     QPushButton *pbIK;
-    //QGroupBox *gbFrontBack;
-    //QRadioButton *cbFront;
-    //QRadioButton *cbBack;
-    //QGroupBox *gbUpDown;
-    //QRadioButton *cbUp;
-    //QRadioButton *cbDown;
-    //QGroupBox *gbPosNeg;
-    //QRadioButton *cbPositive;
-    //QRadioButton *cbNegative;
 
     Link* pLink;
-    //Pose* pPose;
+    Joint* pJoint;
     RPose* pRPose;
-
-    //Brand brand;
-    //string model;
-    //string brand_string();
 
 private slots:
     void pbFK_released();
@@ -58,30 +45,19 @@ public:
     enum PosNeg { Positive, Negative };
     Q_ENUM(PosNeg)
 
-    Joint* pJoint;
     //Joint* pRealJoint;
     QGroupBox *gbGroup;
-
     Robot(QString name);
-    //Robot(Brand b, string model);
     ~Robot();
-    //void setdimensions(double a1z, double a2x, double a2z, double a3z, double a4x, double a4z, double a5x, double a6x);
-    //void setdimensionsIR(void);
-    //void setdimensionsABB(void);
-    //void setdimensionsKUKA(void);
-    //void printAffine3d(Affine3d p);
-    // FK: Forward Kinematic -> return the cartesian position (pose)
-    // of the robot
-    // Parameter: joint's angles in radiants
-    Affine3d FK(Array<double, 6, 1>);
-    // IK: return the joint value 
-    //Array<double, 6, 1> IK(Affine3d p, Array<double, 6, 1> joint_act);
+    // FK: Forward Kinematic
+    void FK();
     // Inverse kinematics IK: from pose to joint values.
-    // paramenters:
-    //      pose: desired robot pose
-    //      joint: set the actual joint values and get the new values as output
-    // 
     ARCCode_t IK(Affine3d p, Array<double, 6, 1>& joint);
+    // det_conf: determine configuration.
+    // Based on the values of pJoint, determine the
+    // robot configuration (Front/Back, Up/down, Positive/Negative)
+    // and write it in pRPose
+    void det_conf();
 };
 
 #endif // ROBOT_H

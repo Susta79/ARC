@@ -98,9 +98,9 @@ bool RPose::get_front()
 {
     return this->cbFront->isChecked();
 }
-void RPose::set_front(bool val)
+void RPose::set_front()
 {
-    this->cbFront->setChecked(val);
+    this->cbFront->setChecked(true);
 }
 
 // Back
@@ -108,9 +108,9 @@ bool RPose::get_back()
 {
     return this->cbBack->isChecked();
 }
-void RPose::set_back(bool val)
+void RPose::set_back()
 {
-    this->cbBack->setChecked(val);
+    this->cbBack->setChecked(true);
 }
 
 // Up
@@ -118,9 +118,9 @@ bool RPose::get_up()
 {
     return this->cbUp->isChecked();
 }
-void RPose::set_up(bool val)
+void RPose::set_up()
 {
-    this->cbUp->setChecked(val);
+    this->cbUp->setChecked(true);
 }
 
 // Down
@@ -128,9 +128,9 @@ bool RPose::get_down()
 {
     return this->cbDown->isChecked();
 }
-void RPose::set_down(bool val)
+void RPose::set_down()
 {
-    this->cbDown->setChecked(val);
+    this->cbDown->setChecked(true);
 }
 
 // Positive
@@ -138,9 +138,9 @@ bool RPose::get_positive()
 {
     return this->cbPositive->isChecked();
 }
-void RPose::set_positive(bool val)
+void RPose::set_positive()
 {
-    this->cbPositive->setChecked(val);
+    this->cbPositive->setChecked(true);
 }
 
 // Negative
@@ -148,8 +148,8 @@ bool RPose::get_negative()
 {
     return this->cbNegative->isChecked();
 }
-void RPose::set_negative(bool val)
+void RPose::set_negative()
 {
-    this->cbNegative->setChecked(val);
+    this->cbNegative->setChecked(true);
 }
 

@@ -26,22 +26,22 @@ public:
     ~RPose();
 
     bool get_front();
-    void set_front(bool);
+    void set_front();
 
     bool get_back();
-    void set_back(bool);
+    void set_back();
 
     bool get_up();
-    void set_up(bool);
+    void set_up();
 
     bool get_down();
-    void set_down(bool);
+    void set_down();
 
     bool get_positive();
-    void set_positive(bool);
+    void set_positive();
 
     bool get_negative();
-    void set_negative(bool);
+    void set_negative();
 };
 
 #endif // RPOSE_H
