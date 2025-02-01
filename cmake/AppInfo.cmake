@@ -21,6 +21,8 @@ set(SOURCE_FILES
     src/link.h
     src/pose.cpp
     src/pose.h
+    src/conf.cpp
+    src/conf.h
     src/rpose.cpp
     src/rpose.h
     src/kinematic.cpp

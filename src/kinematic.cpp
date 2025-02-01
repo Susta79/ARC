@@ -1,9 +1,5 @@
 #include "kinematic.h"
 
-#include <QGroupBox>
-#include <QFormLayout>
-#include <QLabel>
-
 Kinematic::Kinematic(QWidget *parent) : QDialog(parent) {
 
     this->lbTitle = new QLabel("Label");

@@ -110,6 +110,7 @@ Affine3d Pose::get_pose(){
     p.linear() = rot;
     return p;
 }
+
 void Pose::set_pose(Affine3d m){
     double A1, A2, B1, B2, C1, C2;
     Vector3d t = m.translation();
@@ -154,88 +155,4 @@ void Pose::set_pose(Affine3d m){
     //qDebug() << "B1: " << B1 << "; B2: " << B2;
     //qDebug() << "C1: " << C1 << "; C2: " << C2;
     //qDebug() << "";
-}
-
-// x
-double Pose::get_x()
-{
-    return this->dsbX->value();
-}
-void Pose::set_x(double val)
-{
-    this->dsbX->setValue(val);
-}
-
-// y
-double Pose::get_y()
-{
-    return this->dsbY->value();
-}
-void Pose::set_y(double val)
-{
-    this->dsbY->setValue(val);
-}
-
-// z
-double Pose::get_z()
-{
-    return this->dsbZ->value();
-}
-void Pose::set_z(double val)
-{
-    this->dsbZ->setValue(val);
-}
-
-// a
-double Pose::get_a_deg()
-{
-    return this->dsbA->value();
-}
-void Pose::set_a_deg(double val)
-{
-    this->dsbA->setValue(val);
-}
-double Pose::get_a_rad()
-{
-    return this->dsbA->value() * M_PI / 180.0;
-}
-void Pose::set_a_rad(double val)
-{
-    this->dsbA->setValue(val * 180.0 / M_PI);
-}
-
-// b
-double Pose::get_b_deg()
-{
-    return this->dsbB->value();
-}
-void Pose::set_b_deg(double val)
-{
-    this->dsbB->setValue(val);
-}
-double Pose::get_b_rad()
-{
-    return this->dsbB->value() * M_PI / 180.0;
-}
-void Pose::set_b_rad(double val)
-{
-    this->dsbB->setValue(val * 180.0 / M_PI);
-}
-
-// c
-double Pose::get_c_deg()
-{
-    return this->dsbC->value();
-}
-void Pose::set_c_deg(double val)
-{
-    this->dsbC->setValue(val);
-}
-double Pose::get_c_rad()
-{
-    return this->dsbC->value() * M_PI / 180.0;
-}
-void Pose::set_c_rad(double val)
-{
-    this->dsbC->setValue(val * 180.0 / M_PI);
 }

@@ -1,23 +1,15 @@
 #ifndef RPOSE_H
 #define RPOSE_H
 
-#include <QRadioButton>
 #include "pose.h"
-//#define _USE_MATH_DEFINES
-//#include <math.h>
+#include "conf.h"
 
-class RPose : public Pose
+class RPose
 {
 private:
-    QGroupBox *gbFrontBack;
-    QRadioButton *cbFront;
-    QRadioButton *cbBack;
-    QGroupBox *gbUpDown;
-    QRadioButton *cbUp;
-    QRadioButton *cbDown;
-    QGroupBox *gbPosNeg;
-    QRadioButton *cbPositive;
-    QRadioButton *cbNegative;
+
+    Pose *pPose;
+    Conf *pConf;
 
 public:
     QGroupBox *gbRPose;
@@ -25,23 +17,13 @@ public:
     RPose();
     ~RPose();
 
-    bool get_front();
-    void set_front();
+    // pPose
+    Pose* get_pPose(){ return this->pPose; }
+    void set_pPose(Pose *pPose){ this->pPose = pPose; }
 
-    bool get_back();
-    void set_back();
-
-    bool get_up();
-    void set_up();
-
-    bool get_down();
-    void set_down();
-
-    bool get_positive();
-    void set_positive();
-
-    bool get_negative();
-    void set_negative();
+    // pConf
+    Conf* get_pConf(){ return this->pConf; }
+    void set_pConf(Conf *pConf){ this->pConf = pConf; }
 };
 
 #endif // RPOSE_H

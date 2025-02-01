@@ -1,14 +1,4 @@
 #include "robot.h"
-#include "joint.h"
-
-#include <QGroupBox>
-#include <QGridLayout>
-#include <QFormLayout>
-#include <QLabel>
-#include <QButtonGroup>
-#include <QRadioButton>
-
-using Eigen::MatrixXd;
 
 Robot::Robot(QString n)
 {
@@ -46,7 +36,8 @@ Robot::Robot(QString n)
     connect(pbIK, &QPushButton::released, this, &Robot::pbIK_released);
 }
 
-Robot::~Robot(){
+Robot::~Robot()
+{
     if (pJoint) {
         delete pJoint;
         pJoint = nullptr;
@@ -127,7 +118,7 @@ void Robot::FK()
     // Combined transformation: from Frame 6 to Frame 0
     Affine3d T_06 = T_01 * T_12 * T_23 * T_34 * T_45 * T_56;
 
-    this->pRPose->set_pose(T_06);
+    this->pRPose->get_pPose()->set_pose(T_06);
 
 
     Affine3d MP, pJ1, pJ23;
@@ -151,7 +142,7 @@ void Robot::FK()
     // Check if there is a shoulder singularity
     if((abs(WP(0)) < 0.001) && (abs(WP(1)) < 0.001)) {
         // In this case we have a shoulder singularity.
-        this->pRPose->set_front();
+        this->pRPose->get_pConf()->set_front();
     } else {
         // Value of J1 for the Front solution
         J1_front = atan2(WP(1), WP(0));
@@ -165,17 +156,17 @@ void Robot::FK()
         // to the Front or to the Back solution
         if (abs(J1_front - J1) < abs(J1_back - J1)) {
             // The robot is near to the Front solution
-            this->pRPose->set_front();
+            this->pRPose->get_pConf()->set_front();
         } else {
             // The robot is near to the Back solution
-            this->pRPose->set_back();
+            this->pRPose->get_pConf()->set_back();
         }
     }
 
     //Determinine Up/Down configuration base on the value of J1
     // Find J2 and J3
     WPxy = sqrt( pow(WP(0),2) + pow(WP(1),2) );
-    if (this->pRPose->get_front())
+    if (this->pRPose->get_pConf()->get_front())
     {
         // We are in the Front solution
         l = WPxy - this->pLink->get_a2x();
@@ -203,10 +194,10 @@ void Robot::FK()
     // to the Up or to the Down solution
     if (abs(J2_up - J2) < abs(J2_down - J2)) {
         // The robot is near to the Up solution
-        this->pRPose->set_up();
+        this->pRPose->get_pConf()->set_up();
     } else {
         // The robot is near to the Down solution
-        this->pRPose->set_down();
+        this->pRPose->get_pConf()->set_down();
     }
 
     // Calculate Rarm from the values of J1, J2, J3
@@ -236,10 +227,10 @@ void Robot::FK()
             // to the Positive or to the Negative solution
             if (abs(J5_positive - J5) < abs(J5_negative - J5)) {
                 // The robot is near to the Positive solution
-                this->pRPose->set_positive();
+                this->pRPose->get_pConf()->set_positive();
             } else {
                 // The robot is near to the Negative solution
-                this->pRPose->set_negative();
+                this->pRPose->get_pConf()->set_negative();
             }
         }
         else // Rwrist11 = −1 
@@ -247,18 +238,19 @@ void Robot::FK()
             // Wrist singularity. J5 = 180 -> This condition is not
             // possible because the spherical wrist cannot rotate J5 = 180.
             // Not a unique solution: J6 − J4 = atan2(Rwrist32,Rwrist33)
-            this->pRPose->set_positive();
+            this->pRPose->get_pConf()->set_positive();
         }
     }
     else // Rwrist11 = +1
     {
         // Wrist singularity. J5 = 0
         // Not a unique solution: J4 + J6 = atan2(Rwrist32,Rwrist33)
-        this->pRPose->set_positive();
+        this->pRPose->get_pConf()->set_positive();
     }
 }
 
-ARCCode_t Robot::IK(Affine3d p, Array<double, 6, 1>& joint){
+//ARCCode_t Robot::IK(Affine3d p, Array<double, 6, 1>& joint){
+ARCCode_t Robot::IK(){
     double J1, J2, J3, J4, J5, J6;
     double J1_front, J1_back;
     double J2_up, J2_down;
@@ -272,12 +264,12 @@ ARCCode_t Robot::IK(Affine3d p, Array<double, 6, 1>& joint){
     Affine3d MP, pJ1, pJ23;
     Vector3d x_hat, WP;
     Matrix3d Rarm, Rwrist;
-    FrontBack fb;
-    UpDown ud;
-    PosNeg pn;
+    Array<double, 6, 1> joint;
+    Array<double, 6, 1> joint_save;
 
+    joint = this->pJoint->get_joints_rad();
     //Pose of the mounting point (center of the axe 6)
-    MP = p;
+    MP = this->pRPose->get_pPose()->get_pose();
     /*
     MP = UF * p * UT.inverse();
 
@@ -308,7 +300,7 @@ ARCCode_t Robot::IK(Affine3d p, Array<double, 6, 1>& joint){
         // In this case we have a shoulder singularity.
         // Fix J1 as the actual value of J1
         J1 = joint(0);
-        fb = Front;
+        this->pRPose->get_pConf()->set_front();
     } else {
         // FRONT solution
         J1_front = atan2(WP(1), WP(0));
@@ -323,11 +315,11 @@ ARCCode_t Robot::IK(Affine3d p, Array<double, 6, 1>& joint){
         // to the Front or to the Back solution
         if (abs(J1_front - J1) < abs(J1_back - J1)) {
             // The robot is near to the Front solution
-            fb = Front;
+            this->pRPose->get_pConf()->set_front();
             J1 = J1_front;
         } else {
             // The robot is near to the Back solution
-            fb = Back;
+            this->pRPose->get_pConf()->set_back();
             J1 = J1_back;
         }
     }
@@ -335,15 +327,12 @@ ARCCode_t Robot::IK(Affine3d p, Array<double, 6, 1>& joint){
     // Find J2 and J3
     WPxy = sqrt( pow(WP(0),2) + pow(WP(1),2) );
 
-    switch (fb){
-        case Front:
-            // FRONT solution
-            l = WPxy - this->pLink->get_a2x();
-            break;
-        case Back:
-            // BACK solution
-            l = WPxy + this->pLink->get_a2x();
-            break;
+    if (this->pRPose->get_pConf()->get_front()){
+        // FRONT solution
+        l = WPxy - this->pLink->get_a2x();
+    } else{
+        // BACK solution
+        l = WPxy + this->pLink->get_a2x();
     }
     h = WP(2) - this->pLink->get_a1z() - this->pLink->get_a2z();
 
@@ -373,11 +362,11 @@ ARCCode_t Robot::IK(Affine3d p, Array<double, 6, 1>& joint){
     J2 = joint(1);
     if (abs(J2_up - J2) < abs(J2_down - J2)) {
         // The robot is near to the Up solution
-        ud = Up;
+        this->pRPose->get_pConf()->set_up();
         J2 = J2_up;
     } else {
         // The robot is near to the Down solution
-        ud = Down;
+        this->pRPose->get_pConf()->set_down();
         J2 = J2_down;
     }
 
@@ -416,13 +405,13 @@ ARCCode_t Robot::IK(Affine3d p, Array<double, 6, 1>& joint){
             J5 = joint(4);
             if (abs(J5_positive - J5) < abs(J5_negative - J5)) {
                 // The robot is near to the Positive solution
-                pn = Positive;
+                this->pRPose->get_pConf()->set_positive();
                 J5 = J5_positive;
                 J4 = atan2(Rwrist21,-Rwrist31);
                 J6 = atan2(Rwrist12,Rwrist13);
             } else {
                 // The robot is near to the Negative solution
-                pn = Negative;
+                this->pRPose->get_pConf()->set_negative();
                 J5 = J5_negative;
                 J4 = atan2(-Rwrist21,Rwrist31);
                 J6 = atan2(-Rwrist12,-Rwrist13);
@@ -436,7 +425,7 @@ ARCCode_t Robot::IK(Affine3d p, Array<double, 6, 1>& joint){
             J5 = M_PI;
             J4 = joint(3);
             J6 = atan2(Rwrist32,Rwrist33) + J4;
-            pn = Positive;
+            this->pRPose->get_pConf()->set_positive();
         }
     }
     else // Rwrist11 = +1
@@ -446,7 +435,7 @@ ARCCode_t Robot::IK(Affine3d p, Array<double, 6, 1>& joint){
         J5 = 0;
         J4 = joint(3);
         J6 = atan2(Rwrist32,Rwrist33) - J4;
-        pn = Positive;
+        this->pRPose->get_pConf()->set_positive();
     }
 
     //switch(this->brand)
@@ -464,7 +453,9 @@ ARCCode_t Robot::IK(Affine3d p, Array<double, 6, 1>& joint){
     //        break;
     //}
 
-    joint << J1, J2, J3, J4, J5, J6;
+    joint_save << J1, J2, J3, J4, J5, J6;
+    this->pJoint->set_joints_rad(joint_save);
+
     return ARC_CODE_OK;
 }
 
@@ -487,7 +478,7 @@ void Robot::det_conf()
     J6 = this->pJoint->get_joint6_rad();
 
     //Pose of the mounting point (center of the axe 6)
-    MP = this->pRPose->get_pose();
+    MP = this->pRPose->get_pPose()->get_pose();
     x_hat = MP.linear() * Vector3d::UnitX();
     WP = MP.translation() - (this->pLink->get_a6x() * x_hat.normalized());
 
@@ -499,7 +490,7 @@ void Robot::det_conf()
     // Check if there is a shoulder singularity
     if((abs(WP(0)) < 0.001) && (abs(WP(1)) < 0.001)) {
         // In this case we have a shoulder singularity.
-        this->pRPose->set_front();
+        this->pRPose->get_pConf()->set_front();
     } else {
         // Value of J1 for the Front solution
         J1_front = atan2(WP(1), WP(0));
@@ -513,17 +504,17 @@ void Robot::det_conf()
         // to the Front or to the Back solution
         if (abs(J1_front - J1) < abs(J1_back - J1)) {
             // The robot is near to the Front solution
-            this->pRPose->set_front();
+            this->pRPose->get_pConf()->set_front();
         } else {
             // The robot is near to the Back solution
-            this->pRPose->set_back();
+            this->pRPose->get_pConf()->set_back();
         }
     }
 
     //Determinine Up/Down configuration base on the value of J1
     // Find J2 and J3
     WPxy = sqrt( pow(WP(0),2) + pow(WP(1),2) );
-    if (this->pRPose->get_front())
+    if (this->pRPose->get_pConf()->get_front())
     {
         // We are in the Front solution
         l = WPxy - this->pLink->get_a2x();
@@ -551,10 +542,10 @@ void Robot::det_conf()
     // to the Up or to the Down solution
     if (abs(J2_up - J2) < abs(J2_down - J2)) {
         // The robot is near to the Up solution
-        this->pRPose->set_up();
+        this->pRPose->get_pConf()->set_up();
     } else {
         // The robot is near to the Down solution
-        this->pRPose->set_down();
+        this->pRPose->get_pConf()->set_down();
     }
 
     // Calculate Rarm from the values of J1, J2, J3
@@ -584,10 +575,10 @@ void Robot::det_conf()
             // to the Positive or to the Negative solution
             if (abs(J5_positive - J5) < abs(J5_negative - J5)) {
                 // The robot is near to the Positive solution
-                this->pRPose->set_positive();
+                this->pRPose->get_pConf()->set_positive();
             } else {
                 // The robot is near to the Negative solution
-                this->pRPose->set_negative();
+                this->pRPose->get_pConf()->set_negative();
             }
         }
         else // Rwrist11 = −1 
@@ -595,14 +586,14 @@ void Robot::det_conf()
             // Wrist singularity. J5 = 180 -> This condition is not
             // possible because the spherical wrist cannot rotate J5 = 180.
             // Not a unique solution: J6 − J4 = atan2(Rwrist32,Rwrist33)
-            this->pRPose->set_positive();
+            this->pRPose->get_pConf()->set_positive();
         }
     }
     else // Rwrist11 = +1
     {
         // Wrist singularity. J5 = 0
         // Not a unique solution: J4 + J6 = atan2(Rwrist32,Rwrist33)
-        this->pRPose->set_positive();
+        this->pRPose->get_pConf()->set_positive();
     }
 }
 
@@ -614,7 +605,5 @@ void Robot::pbFK_released()
 
 void Robot::pbIK_released()
 {
-    Array<double, 6, 1> j = pJoint->get_joints_rad();
-    if(this->IK(this->pRPose->get_pose(), j) == ARC_CODE_OK)
-        pJoint->set_joints_rad(j);
+    ARCCode_t code = this->IK();
 }

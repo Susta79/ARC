@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QLabel>
 #include <QWidget>
+#include <QFormLayout>
 
 class Kinematic : public QDialog {
 private:

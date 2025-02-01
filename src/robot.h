@@ -1,7 +1,6 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
-//#include <string>
 #include <QWidget>
 #include <QGroupBox>
 #include <QPushButton>
@@ -12,7 +11,6 @@
 
 #include "joint.h"
 #include "link.h"
-#include "pose.h"
 #include "rpose.h"
 #include <include/ARC/error_def.h>
 
@@ -36,23 +34,13 @@ private slots:
     void pbIK_released();
 
 public:
-    enum FrontBack { Front, Back };
-    Q_ENUM(FrontBack)
-
-    enum UpDown { Up, Down };
-    Q_ENUM(UpDown)
-
-    enum PosNeg { Positive, Negative };
-    Q_ENUM(PosNeg)
-
-    //Joint* pRealJoint;
     QGroupBox *gbGroup;
     Robot(QString name);
     ~Robot();
     // FK: Forward Kinematic
     void FK();
     // Inverse kinematics IK: from pose to joint values.
-    ARCCode_t IK(Affine3d p, Array<double, 6, 1>& joint);
+    ARCCode_t IK();
     // det_conf: determine configuration.
     // Based on the values of pJoint, determine the
     // robot configuration (Front/Back, Up/down, Positive/Negative)
