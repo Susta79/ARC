@@ -9,6 +9,8 @@
 #include <QDoubleSpinBox>
 #include <QFormLayout>
 #include <QLabel>
+#include <QSlider>
+#include <QHBoxLayout>
 
 #include <Eigen/Dense>
 
@@ -25,6 +27,12 @@ private:
     QDoubleSpinBox *dsbJoint4;
     QDoubleSpinBox *dsbJoint5;
     QDoubleSpinBox *dsbJoint6;
+    QSlider *sldJoint1;
+    QSlider *sldJoint2;
+    QSlider *sldJoint3;
+    QSlider *sldJoint4;
+    QSlider *sldJoint5;
+    QSlider *sldJoint6;
 
 public:
     QGroupBox *gbJoints;
@@ -106,7 +114,6 @@ public:
     double get_joint6_deg(){ return this->dsbJoint6->value(); }
     void set_joint6_rad(double val){ this->dsbJoint6->setValue(val * 180.0 / M_PI); }
     void set_joint6_deg(double val){ this->dsbJoint6->setValue(val); }
-
 };
 
 #endif // JOINT_H
