@@ -29,6 +29,8 @@ set(SOURCE_FILES
     src/kinematic.h
     src/tcpclient.cpp
     src/tcpclient.h
+    src/robi.cpp
+    src/robi.h
     include/ARC/error_def.h
 )
 
