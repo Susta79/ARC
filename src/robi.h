@@ -99,7 +99,6 @@ private:
             alpha = degs(alpha);
         return alpha;
     }
-
     // N.B. Posso riscrivere questa funzione utilizzando la funzione Slerp del Quaternione di Eigen
     Eigen::MatrixXd slerp(Eigen::Vector3d euler_array1, Eigen::Vector3d euler_array2, Eigen::VectorXd s, bool in_rads, bool out_rads){
         Eigen::Matrix3d R1 = rot_mat_from_euler(euler_array1, in_rads = in_rads);
