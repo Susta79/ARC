@@ -131,6 +131,68 @@ private:
         
         return euler_array;
     }
+    //path functions
+    Eigen::Vector3d circumcenter(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2){
+        Eigen::Vector3d cc;
+        double a = (P2-P1).dot(P2-P1);
+        double b = (P0-P2).dot(P0-P2);
+        double c = (P1-P0).dot(P1-P0);        
+        cc = ((a)*(b+c-a)*P0 + b*(c+a-b)*P1 +c*(a+b-c)*P2)/((a)*(b+c-a) + b*(c+a-b) + c*(a+b-c));
+        return cc;
+    }
+    Eigen::Vector3d circumcenter2(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2){
+        double CR = circumradius(P0, P1, P2);
+        Eigen::Vector3d y = (P0-P1).cross(P2-P1);
+        Eigen::Vector3d z = y.cross(P0-P1);
+        z = z.normalized();
+        Eigen::Vector3d x = sqrt(pow(CR, 2) - (1/4)*pow((P0-P1).norm(), 2)) * z;
+        Eigen::Vector3d CC = (P0+P1)/2 + x;
+        return CC;
+    }
+    Eigen::Vector3d circumcenter3(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2){
+        double denom = 2 * pow((P0-P1).cross(P1-P2).norm(), 2);
+        double alpha = pow((P1-P2).norm(), 2) * (P0-P1).dot(P0-P2);
+        double beta = pow((P0-P2).norm(), 2) * (P1-P0).dot(P1-P2);
+        double gamma = pow((P0-P1).norm(), 2) * (P2-P1).dot(P2-P0);
+        Eigen::Vector3d CC = (alpha*P0 + beta*P1 + gamma*P2) / denom;
+        return CC;
+    }
+    double circumradius(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2){
+        double a = (P0-P1).norm();
+        double b = (P1-P2).norm();
+        double c = (P2-P0).norm();
+        double cr = a*b*c/ (2*(P0-P1).cross(P1-P2).norm());
+        return cr;
+    }
+    // N.B.: Change the error code ARC_ERR_APP_J2_TOO_CLOSE
+    ARCCode_t circle_params(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, Eigen::Vector3d &CC, double CR, Eigen::Vector3d &U, Eigen::Vector3d &V, double &alpha){
+        CC = circumcenter(P0, P1, P2);
+        CR = circumradius(P0,P1,P2);
+        Eigen::Vector3d v01 = P1-P0;
+        Eigen::Vector3d v12 = P2-P1;
+        Eigen::Vector3d N = v01.cross(v12);
+        if (N(0) == 0 and N(1)==0 and N(2) ==0)
+            return ARC_ERR_APP_J2_TOO_CLOSE;
+    
+        N.normalize();
+        U = P0-CC;
+        U.normalize();
+        V = N.cross(U);
+    
+        Eigen::Vector3d vc0 = P0-CC;
+        Eigen::Vector3d vc2 = P2-CC;
+
+        alpha = acos(vc0.dot(vc2)/(vc0.norm()*vc2.norm()));
+
+        if (abs(vc0.dot(vc0)) != 1){
+            Eigen::Vector3d cross1 = vc0.cross(vc2);
+            cross1.normalize();
+            if (N.dot(cross1) < 0)
+                alpha = M_2_PI - alpha;
+        }
+
+        return ARC_CODE_OK;
+    }
 
 public:
     Robi(double a1z, double a2x, double a2z, double a3z, double a4z, double a4x, double a5x, double a6x){
