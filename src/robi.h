@@ -100,11 +100,8 @@ private:
         return alpha;
     }
 
-    // Questa funzione non è completa
     // N.B. Posso riscrivere questa funzione utilizzando la funzione Slerp del Quaternione di Eigen
-    /*
     Eigen::MatrixXd slerp(Eigen::Vector3d euler_array1, Eigen::Vector3d euler_array2, Eigen::VectorXd s, bool in_rads, bool out_rads){
-        // N.B. Posso riscrivere questa funzione utilizzando la funzione Slerp del Quaternione di Eigen
         Eigen::Matrix3d R1 = rot_mat_from_euler(euler_array1, in_rads = in_rads);
         Eigen::Matrix3d R2 = rot_mat_from_euler(euler_array2, in_rads = in_rads);
 
@@ -113,26 +110,28 @@ private:
         q2 = q_from_rot_mat(R2);
 
         double alpha = alpha_slerp(q1, q2, out_rads = true);
+        int len_s = s.size();
+        Eigen::MatrixXd euler_array(len_s,3);
 
-        Eigen::VectorXd q_array(s.size());
-        for (size_t i = 0; i < s.size(); i++)
+        //Eigen::VectorXd q_array(len_s);
+        Eigen::Quaterniond q;
+        Eigen::Matrix3d R;
+        Eigen::Vector3d euler;
+        for (size_t i = 0; i < len_s; i++)
         {
-            q_array(i) = (sin(alpha*(1-i))/sin(alpha))*q1.coeffs() + (sin(alpha*i)/sin(alpha))*q2.coeffs();
+            q.coeffs() = (sin(alpha*(1-i))/sin(alpha))*q1.coeffs() + (sin(alpha*i)/sin(alpha))*q2.coeffs();
+            R = rot_mat_from_q(q);
+            euler = euler_from_rot_mat(R, out_rads);
+            euler_array(i,0) = euler(0);
+            euler_array(i,1) = euler(1);
+            euler_array(i,2) = euler(2);
         }
 
-        int len_q_array = len(q_array);
-        Eigen::MatrixXd euler_array(len_q_array,3);
-
-        for i in range(len(q_array)):
-            R = rot_mat_from_q(q_array[i])
-            euler = euler_from_rot_mat(R, out_rads = True)
-            euler_array[i] = euler
-        
         if (out_rads == false)
-            euler_array = degs(euler_array)
+            euler_array = euler_array * 180 / M_PI;
         
-        return euler_array
-    }*/
+        return euler_array;
+    }
 
 public:
     Robi(double a1z, double a2x, double a2z, double a3z, double a4z, double a4x, double a5x, double a6x){
