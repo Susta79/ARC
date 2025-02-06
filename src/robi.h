@@ -165,9 +165,9 @@ private:
         return cr;
     }
     // N.B.: Change the error code ARC_ERR_APP_J2_TOO_CLOSE
-    ARCCode_t circle_params(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, Eigen::Vector3d &CC, double CR, Eigen::Vector3d &U, Eigen::Vector3d &V, double &alpha){
-        CC = circumcenter(P0, P1, P2);
-        CR = circumradius(P0,P1,P2);
+    ARCCode_t circle_params(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, Eigen::Vector3d *CC, double *CR, Eigen::Vector3d *U, Eigen::Vector3d *V, double *alpha){
+        *CC = circumcenter(P0, P1, P2);
+        *CR = circumradius(P0,P1,P2);
         Eigen::Vector3d v01 = P1-P0;
         Eigen::Vector3d v12 = P2-P1;
         Eigen::Vector3d N = v01.cross(v12);
@@ -175,24 +175,71 @@ private:
             return ARC_ERR_APP_J2_TOO_CLOSE;
     
         N.normalize();
-        U = P0-CC;
-        U.normalize();
-        V = N.cross(U);
+        *U = P0 - *CC;
+        U->normalize();
+        *V = N.cross(*U);
     
-        Eigen::Vector3d vc0 = P0-CC;
-        Eigen::Vector3d vc2 = P2-CC;
+        Eigen::Vector3d vc0 = P0 - *CC;
+        Eigen::Vector3d vc2 = P2 - *CC;
 
-        alpha = acos(vc0.dot(vc2)/(vc0.norm()*vc2.norm()));
+        *alpha = acos(vc0.dot(vc2)/(vc0.norm()*vc2.norm()));
 
         if (abs(vc0.dot(vc0)) != 1){
             Eigen::Vector3d cross1 = vc0.cross(vc2);
             cross1.normalize();
             if (N.dot(cross1) < 0)
-                alpha = M_2_PI - alpha;
+                *alpha = M_2_PI - *alpha;
         }
 
         return ARC_CODE_OK;
     }
+    // N.B.: Change the error code ARC_ERR_APP_J2_TOO_CLOSE
+    ARCCode_t circum_alpha(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, double *alpha){
+        Eigen::Vector3d CC = circumcenter(P0,P1,P2);
+        Eigen::Vector3d v01 = P1-P0;
+        Eigen::Vector3d v12 = P2-P1;
+        Eigen::Vector3d N = v01.cross(v12);
+        if (N(0) == 0 and N(1)==0 and N(2) ==0)
+            return ARC_ERR_APP_J2_TOO_CLOSE;
+
+        Eigen::Vector3d vc0 = P0-CC;
+        Eigen::Vector3d vc2 = P2-CC;
+
+        *alpha = acos(vc0.dot(vc2)/(vc0.norm()*vc2.norm()));
+
+        if (abs(vc0.dot(vc0)) != 1){
+            Eigen::Vector3d cross1 = vc0.cross(vc2);
+            cross1.normalize();
+            if (N.dot(cross1) < 0)
+                *alpha = M_2_PI - *alpha;
+        }
+
+        return ARC_CODE_OK;
+    }
+    Eigen::MatrixXd circular_path(Eigen::Vector3d CC, double CR, Eigen::Vector3d U, Eigen::Vector3d V, Eigen::VectorXd s){
+        int len_s = s.size();
+        Eigen::Vector3d xyz;
+        Eigen::MatrixXd xyz_array(len_s,3);
+        for (size_t i = 0; i < len_s; i++)
+        {
+            xyz = CC + CR*cos(i)*U + CR*sin(i)*V;
+            xyz_array(i,0) = xyz(1);
+            xyz_array(i,1) = xyz(0);
+            xyz_array(i,2) = xyz(2);
+        }
+
+        return xyz_array;
+    }
+//def circular_path_lambda(CC, CR,U,V):
+//    return lambda theta: np.array([CC + CR*np.cos(theta)*U + CR*np.sin(theta)*V])
+    double arc_length(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2){
+        double CR = circumradius(P0, P1, P2);
+        double alpha;
+        circum_alpha(P0, P1, P2, &alpha);
+        double arc_length = CR * alpha;
+        return arc_length;
+    }
+
 
 public:
     Robi(double a1z, double a2x, double a2z, double a3z, double a4z, double a4x, double a5x, double a6x){
@@ -207,10 +254,10 @@ public:
     }
     //~Robi();
     // Robot object
-    ARCCode_t for_kin(Eigen::Array<double, 6, 1> joint, bool in_rads, bool out_rads, Eigen::Array<double, 6, 1> &xyzabc, Eigen::Affine3d &t16);
+    ARCCode_t for_kin(Eigen::Array<double, 6, 1> joint, bool in_rads, bool out_rads, Eigen::Array<double, 6, 1> *xyzabc, Eigen::Affine3d *t16);
     // inv_kin: TODO is still to complete
-    ARCCode_t inv_kin(Eigen::Array<double, 6, 1> xyzabc, bool front_pose, bool up_pose, bool in_rads, bool out_rads, Eigen::Array<double, 6, 1> &joint);
-    ARCCode_t Jacobian(Eigen::Array<double, 6, 1> joint, bool in_rads, Eigen::Matrix<double, 6, 6> &J);
+    ARCCode_t inv_kin(Eigen::Array<double, 6, 1> xyzabc, bool front_pose, bool up_pose, bool in_rads, bool out_rads, Eigen::Array<double, 6, 1> *joint);
+    ARCCode_t Jacobian(Eigen::Array<double, 6, 1> joint, bool in_rads, Eigen::Matrix<double, 6, 6> *J);
 };
 
 #endif // ROBI_H
