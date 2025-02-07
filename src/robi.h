@@ -42,8 +42,6 @@ private:
     }
     double rads(double angle){ return angle * M_PI / 180; }
     double degs(double angle){ return angle * 180 / M_PI; }
-    Eigen::Vector3d vec_norm(Eigen::Vector3d vec){ return vec.normalized(); }
-    double vec_len(Eigen::Vector3d vec){ return vec.norm(); }
     Eigen::Affine3d trans_mat(Eigen::Matrix3d rot, Eigen::Vector3d trans){
         Eigen::Affine3d T;
         T.linear() = rot;
@@ -87,35 +85,45 @@ private:
         return euler;
     }
     double alpha_slerp(Eigen::Quaterniond q1, Eigen::Quaterniond q2, bool out_rads){
-        double dot = q1.dot(q2);
-        double lq1 = q1.norm();
-        double lq2 = q2.norm();
-        if (dot<0){
-            q1.coeffs() = -q1.coeffs();
-            dot = q1.dot(q2);
-        }
-        double alpha = acos(dot/(lq1*lq2));
+        double alpha;
+        //double dot = q1.dot(q2);
+        //double lq1 = q1.norm();
+        //double lq2 = q2.norm();
+        //if (dot<0){
+        //    q1.coeffs() = -q1.coeffs();
+        //    dot = q1.dot(q2);
+        //}
+        //double alpha = acos(dot/(lq1*lq2));
+        alpha = q1.angularDistance(q2);
         if (out_rads == false)
             alpha = degs(alpha);
         return alpha;
     }
-    // N.B. Posso riscrivere questa funzione utilizzando la funzione Slerp del Quaternione di Eigen
     Eigen::MatrixXd slerp(Eigen::Vector3d euler_array1, Eigen::Vector3d euler_array2, Eigen::VectorXd s, bool in_rads, bool out_rads){
-        Eigen::Matrix3d R1 = rot_mat_from_euler(euler_array1, in_rads = in_rads);
-        Eigen::Matrix3d R2 = rot_mat_from_euler(euler_array2, in_rads = in_rads);
+        Eigen::Quaterniond q1, q2, qSlerp;
+        Eigen::Vector3d euler;
+        Eigen::Matrix3d R, R1, R2;
+        R1 = rot_mat_from_euler(euler_array1, in_rads = in_rads);
+        R2 = rot_mat_from_euler(euler_array2, in_rads = in_rads);
 
-        Eigen::Quaterniond q1, q2;
         q1 = q_from_rot_mat(R1);
         q2 = q_from_rot_mat(R2);
-
-        double alpha = alpha_slerp(q1, q2, out_rads = true);
+        
         int len_s = s.size();
         Eigen::MatrixXd euler_array(len_s,3);
+        for (size_t i = 0; i < len_s; i++){
+            qSlerp = q1.slerp(s(i), q2);
+            R = rot_mat_from_q(qSlerp);
+            euler = euler_from_rot_mat(R, out_rads);
+            euler_array(i,0) = euler(0);
+            euler_array(i,1) = euler(1);
+            euler_array(i,2) = euler(2);
+        }
+        
+        /*
+        double alpha = alpha_slerp(q1, q2, out_rads = true);
 
-        //Eigen::VectorXd q_array(len_s);
         Eigen::Quaterniond q;
-        Eigen::Matrix3d R;
-        Eigen::Vector3d euler;
         for (size_t i = 0; i < len_s; i++)
         {
             q.coeffs() = (sin(alpha*(1-i))/sin(alpha))*q1.coeffs() + (sin(alpha*i)/sin(alpha))*q2.coeffs();
@@ -125,6 +133,7 @@ private:
             euler_array(i,1) = euler(1);
             euler_array(i,2) = euler(2);
         }
+        */
 
         if (out_rads == false)
             euler_array = euler_array * 180 / M_PI;
@@ -164,7 +173,6 @@ private:
         double cr = a*b*c/ (2*(P0-P1).cross(P1-P2).norm());
         return cr;
     }
-    // N.B.: Change the error code ARC_ERR_APP_J2_TOO_CLOSE
     ARCCode_t circle_params(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, Eigen::Vector3d *CC, double *CR, Eigen::Vector3d *U, Eigen::Vector3d *V, double *alpha){
         *CC = circumcenter(P0, P1, P2);
         *CR = circumradius(P0,P1,P2);
@@ -172,7 +180,7 @@ private:
         Eigen::Vector3d v12 = P2-P1;
         Eigen::Vector3d N = v01.cross(v12);
         if (N(0) == 0 and N(1)==0 and N(2) ==0)
-            return ARC_ERR_APP_J2_TOO_CLOSE;
+            return ARC_ERR_APP_CIRC_POINTS_COLLIN;
     
         N.normalize();
         *U = P0 - *CC;
@@ -193,14 +201,13 @@ private:
 
         return ARC_CODE_OK;
     }
-    // N.B.: Change the error code ARC_ERR_APP_J2_TOO_CLOSE
     ARCCode_t circum_alpha(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, double *alpha){
         Eigen::Vector3d CC = circumcenter(P0,P1,P2);
         Eigen::Vector3d v01 = P1-P0;
         Eigen::Vector3d v12 = P2-P1;
         Eigen::Vector3d N = v01.cross(v12);
         if (N(0) == 0 and N(1)==0 and N(2) ==0)
-            return ARC_ERR_APP_J2_TOO_CLOSE;
+            return ARC_ERR_APP_CIRC_POINTS_COLLIN;
 
         Eigen::Vector3d vc0 = P0-CC;
         Eigen::Vector3d vc2 = P2-CC;
@@ -239,7 +246,6 @@ private:
         double arc_length = CR * alpha;
         return arc_length;
     }
-
 
 public:
     Robi(double a1z, double a2x, double a2z, double a3z, double a4z, double a4x, double a5x, double a6x){

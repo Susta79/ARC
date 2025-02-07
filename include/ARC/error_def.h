@@ -100,7 +100,7 @@ typedef uint32_t ARCError_t;
 #define ARC_CODE_J2_TOO_CLOSE              0x31u
 
 /** The requested action will not finish as expected because it was superseded by another action which takes precedence. */
-//#define ARC_CODE_ACTION_SUPERSEDED          0x32u
+#define ARC_CODE_CIRC_POINTS_COLLIN        0x32u
 
 /** The application that is specified in the recipe file could not be loaded. */
 //#define ARC_CODE_PREP_RECIPE                0x33u
@@ -375,6 +375,8 @@ typedef uint32_t ARCError_t;
 
 #define ARC_ERR_KIN__POSE_NOT_REACHABLE        (ARC_SEVERITY_ERROR | ARC_COMPONENT_KINEMATIC | ARC_CODE_POSE_NOT_REACHABLE)
 #define ARC_ERR_APP_J2_TOO_CLOSE               (ARC_SEVERITY_ERROR | ARC_COMPONENT_KINEMATIC | ARC_CODE_J2_TOO_CLOSE)
+// Circle points P0,P1,P2
+#define ARC_ERR_APP_CIRC_POINTS_COLLIN         (ARC_SEVERITY_ERROR | ARC_COMPONENT_KINEMATIC | ARC_CODE_CIRC_POINTS_COLLIN)
 //#define ARC_ERR_APP_INV_RECIPE_OUTPUT         (ARC_SEVERITY_ERROR | ARC_COMPONENT_APPLICATION | ARC_CODE_INV_RECIPE_OUTPUT)
 
 //#define ARC_WARN_APP_INV_JOB_PARAMS           (ARC_SEVERITY_WARNING | ARC_COMPONENT_APPLICATION | ARC_CODE_INV_JOB_PARAMS)
