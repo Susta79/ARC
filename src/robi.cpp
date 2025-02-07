@@ -51,6 +51,8 @@ ARCCode_t Robi::for_kin(Eigen::Array<double, 6, 1> angles, bool in_rads, bool ou
 
 ARCCode_t Robi::inv_kin(Eigen::Array<double, 6, 1> xyzabc, bool front_pose, bool up_pose, bool in_rads, bool out_rads, Eigen::Array<double, 6, 1> *joint){
     double x, y, z, a, b, c;
+    Eigen::Vector3d TCPxyz, x_hat, WP;
+    Eigen::Matrix3d R;
     x = xyzabc(0);
     y = xyzabc(1);
     z = xyzabc(2);
@@ -66,10 +68,21 @@ ARCCode_t Robi::inv_kin(Eigen::Array<double, 6, 1> xyzabc, bool front_pose, bool
         c = rads(xyzabc(5));
     }
 
-    Eigen::Vector3d TCPxyz(x, y, z);
-    Eigen::Matrix3d R = rotz(c) * roty(b) *rotx(a);
-    
-    /*
+    TCPxyz << x, y, z;
+    R = rotz(c) * roty(b) *rotx(a);
+
+    // x_hat = R[:,0]
+    x_hat = R * Eigen::Vector3d::UnitX();
+    WP = TCPxyz - (this->a6x * x_hat.normalized());
+    double j1 = atan2(WP(1), WP(0));
+    double WPxy = sqrt(pow(WP(0),2) + pow(WP(1),2));
+    double l;
+    if (front_pose)
+        l = WPxy - this->a2x;
+    else
+        l = WPxy + this->a2x;
+
+/*
         x = xyzabc[0]
         y = xyzabc[1]
         z = xyzabc[2]
