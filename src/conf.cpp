@@ -49,10 +49,6 @@ Conf::Conf()
 
 Conf::~Conf()
 {
-    if (gbFrontBack) {
-        delete gbFrontBack;
-        gbFrontBack = nullptr;
-    }
     if (cbFront) {
         delete cbFront;
         cbFront = nullptr;
@@ -60,10 +56,6 @@ Conf::~Conf()
     if (cbBack) {
         delete cbBack;
         cbBack = nullptr;
-    }
-    if (gbUpDown) {
-        delete gbUpDown;
-        gbUpDown = nullptr;
     }
     if (cbUp) {
         delete cbUp;
@@ -73,10 +65,6 @@ Conf::~Conf()
         delete cbDown;
         cbDown = nullptr;
     }
-    if (gbPosNeg) {
-        delete gbPosNeg;
-        gbPosNeg = nullptr;
-    }
     if (cbPositive) {
         delete cbPositive;
         cbPositive = nullptr;
@@ -84,5 +72,21 @@ Conf::~Conf()
     if (cbNegative) {
         delete cbNegative;
         cbNegative = nullptr;
+    }
+    if (gbFrontBack) {
+        delete gbFrontBack;
+        gbFrontBack = nullptr;
+    }
+    if (gbUpDown) {
+        delete gbUpDown;
+        gbUpDown = nullptr;
+    }
+    if (gbPosNeg) {
+        delete gbPosNeg;
+        gbPosNeg = nullptr;
+    }
+    if (gbConf) {
+        delete gbConf;
+        gbConf = nullptr;
     }
 }

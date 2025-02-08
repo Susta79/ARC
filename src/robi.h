@@ -8,6 +8,9 @@
 
 #include <iostream>
 
+#define DEG_TO_RAD 180.0 / M_PI
+#define RAD_TO_DEG M_PI / 180.0
+
 class Robi
 {
 private:
@@ -25,10 +28,16 @@ private:
     Eigen::Matrix3d rotx(double angle);
     Eigen::Matrix3d roty(double angle);
     Eigen::Matrix3d rotz(double angle);
-    double rads(double angle);
-    double degs(double angle);
-    Eigen::Affine3d trans_mat(Eigen::Matrix3d rot, Eigen::Vector3d trans);
+    //double rads_d(double angle);
+    //double degs_d(double angle);
+    //Eigen::Vector3d rads_vec3d(Eigen::Vector3d vec);
+    //Eigen::Vector3d degs_vec3d(Eigen::Vector3d vec);
+    //Eigen::MatrixXd rads_matXd(Eigen::MatrixXd mat);
+    //Eigen::MatrixXd degs_matXd(Eigen::MatrixXd mat);
+    //Eigen::Array<double, 6, 1> rads_arr6d(Eigen::Array<double, 6, 1> angles);
+    //Eigen::Array<double, 6, 1> degs_arr6d(Eigen::Array<double, 6, 1> angles);
     // Orientation functions
+    Eigen::Affine3d trans_mat(Eigen::Matrix3d rot, Eigen::Vector3d trans);
     Eigen::Matrix3d rot_mat_from_euler(Eigen::Vector3d euler, bool in_rads);
     Eigen::Quaterniond q_from_rot_mat(Eigen::Matrix3d R);
     Eigen::Matrix3d rot_mat_from_q(Eigen::Quaterniond q);
@@ -43,7 +52,7 @@ private:
     ARCCode_t circum_alpha(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, double *alpha);
     //def circular_path_lambda(CC, CR,U,V):
     //    return lambda theta: np.array([CC + CR*np.cos(theta)*U + CR*np.sin(theta)*V])
-    Eigen::VectorXd linspace(double start, double end, int num);
+    //Eigen::VectorXd linspace(double start, double end, int num);
     ARCCode_t circle_params(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, Eigen::Vector3d *CC, double *CR, Eigen::Vector3d *U, Eigen::Vector3d *V, double *alpha);
     double arc_length(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2);
     Eigen::MatrixXd circular_path(Eigen::Vector3d CC, double CR, Eigen::Vector3d U, Eigen::Vector3d V, Eigen::VectorXd s);

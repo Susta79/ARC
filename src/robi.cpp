@@ -1,14 +1,7 @@
 #include "robi.h"
 
 Robi::Robi(){
-    this->a1z = a1z;
-    this->a2x = a2x;
-    this->a2z = a2z;
-    this->a3z = a3z;
-    this->a4z = a4z;
-    this->a4x = a4x;
-    this->a5x = a5x;
-    this->a6x = a6x;
+    this->init(650.0, 400.0, 680.0, 1100.0, 766.0, 230.0, 345.0, 244.0);
 }
 
 Robi::Robi(double a1z, double a2x, double a2z, double a3z, double a4z, double a4x, double a5x, double a6x){
@@ -33,35 +26,62 @@ void Robi::init(double a1z, double a2x, double a2z, double a3z, double a4z, doub
 
 Eigen::Matrix3d Robi::rotx(double angle){
     Eigen::Matrix3d R;
-    R << 1, 0, 0,
-        0, cos(angle), -sin(angle),
-        0, sin(angle), cos(angle);
+    //R << 1, 0, 0,
+    //    0, cos(angle), -sin(angle),
+    //    0, sin(angle), cos(angle);
+    R = Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitX()).toRotationMatrix();
     return R;
 }
 
 Eigen::Matrix3d Robi::roty(double angle){
     Eigen::Matrix3d R;
-    R << cos(angle), 0, sin(angle),
-        0, 1, 0,
-        -sin(angle), 0, cos(angle);
+    //R << cos(angle), 0, sin(angle),
+    //    0, 1, 0,
+    //    -sin(angle), 0, cos(angle);
+    R = Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitY()).toRotationMatrix();
     return R;
 }
 
 Eigen::Matrix3d Robi::rotz(double angle){
     Eigen::Matrix3d R;
-    R << cos(angle), -sin(angle), 0,
-        sin(angle), cos(angle), 0,
-        0, 0, 1;
+    //R << cos(angle), -sin(angle), 0,
+    //    sin(angle), cos(angle), 0,
+    //    0, 0, 1;
+    R = Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitZ()).toRotationMatrix();
     return R;
 }
 
-double Robi::rads(double angle){
-    return angle * M_PI / 180;
-}
-
-double Robi::degs(double angle){
-    return angle * 180 / M_PI;
-}
+//double Robi::rads_d(double angle){
+//    return angle * RAD_TO_DEG;
+//}
+//
+//double Robi::degs_d(double angle){
+//    return angle * DEG_TO_RAD;
+//}
+//
+//Eigen::Vector3d Robi::rads_vec3d(Eigen::Vector3d vec){
+//    return vec * M_PI / 180.0;
+//}
+//
+//Eigen::Vector3d Robi::degs_vec3d(Eigen::Vector3d vec){
+//    return vec * 180.0 / M_PI;
+//}
+//
+//Eigen::MatrixXd Robi::rads_matXd(Eigen::MatrixXd mat){
+//    return mat * M_PI / 180.0;
+//}
+//
+//Eigen::MatrixXd Robi::degs_matXd(Eigen::MatrixXd mat){
+//    return mat * 180.0 / M_PI;
+//}
+//
+//Eigen::Array<double, 6, 1> rads_arr6d(Eigen::Array<double, 6, 1> angles){
+//    return angles * M_PI / 180.0;
+//}
+//
+//Eigen::Array<double, 6, 1> degs_arr6d(Eigen::Array<double, 6, 1> angles){
+//    return angles * 180.0 / M_PI;
+//}
 
 Eigen::Affine3d Robi::trans_mat(Eigen::Matrix3d rot, Eigen::Vector3d trans){
     Eigen::Affine3d T;
@@ -73,7 +93,7 @@ Eigen::Affine3d Robi::trans_mat(Eigen::Matrix3d rot, Eigen::Vector3d trans){
 // Orientation functions
 Eigen::Matrix3d Robi::rot_mat_from_euler(Eigen::Vector3d euler, bool in_rads){
     if (in_rads == false)
-        euler = euler * M_PI / 180;
+        euler *= DEG_TO_RAD;
     double a = euler(0);
     double b = euler(1);
     double c = euler(2);
@@ -106,7 +126,7 @@ Eigen::Vector3d Robi::euler_from_rot_mat(Eigen::Matrix3d R, bool out_rads){
     Eigen::Vector3d euler;
     euler << a, b, c;
     if (out_rads == false)
-        euler= euler * 180 / M_PI;
+        euler *= RAD_TO_DEG;
     return euler;
 }
 
@@ -122,7 +142,7 @@ double Robi::alpha_slerp(Eigen::Quaterniond q1, Eigen::Quaterniond q2, bool out_
     //double alpha = acos(dot/(lq1*lq2));
     alpha = q1.angularDistance(q2);
     if (out_rads == false)
-        alpha = degs(alpha);
+        alpha *= RAD_TO_DEG;
     return alpha;
 }
 
@@ -142,9 +162,10 @@ Eigen::MatrixXd Robi::slerp(Eigen::Vector3d euler_array1, Eigen::Vector3d euler_
         qSlerp = q1.slerp(s(i), q2);
         R = rot_mat_from_q(qSlerp);
         euler = euler_from_rot_mat(R, out_rads);
-        euler_array(i,0) = euler(0);
-        euler_array(i,1) = euler(1);
-        euler_array(i,2) = euler(2);
+        euler_array.row(i) << euler(0), euler(1), euler(2);
+        //euler_array(i,0) = euler(0);
+        //euler_array(i,1) = euler(1);
+        //euler_array(i,2) = euler(2);
     }
     
     /*
@@ -163,7 +184,7 @@ Eigen::MatrixXd Robi::slerp(Eigen::Vector3d euler_array1, Eigen::Vector3d euler_
     */
 
     if (out_rads == false)
-        euler_array = euler_array * 180 / M_PI;
+        euler_array *= RAD_TO_DEG;
     
     return euler_array;
 }
@@ -261,35 +282,31 @@ Eigen::MatrixXd Robi::circular_path(Eigen::Vector3d CC, double CR, Eigen::Vector
     int len_s = s.size();
     Eigen::Vector3d xyz;
     Eigen::MatrixXd xyz_array(len_s,3);
-    for (size_t i = 0; i < len_s; i++)
-    {
-        xyz = CC + CR*cos(i)*U + CR*sin(i)*V;
-        xyz_array(i,0) = xyz(1);
-        xyz_array(i,1) = xyz(0);
-        xyz_array(i,2) = xyz(2);
+    for (size_t i = 0; i < len_s; i++){
+        xyz = CC + CR*cos(s(i))*U + CR*sin(s(i))*V;
+        xyz_array.row(i) << xyz(0), xyz(1), xyz(2);
     }
-
     return xyz_array;
 }
 
 //def circular_path_lambda(CC, CR,U,V):
 //    return lambda theta: np.array([CC + CR*np.cos(theta)*U + CR*np.sin(theta)*V])
 double Robi::arc_length(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2){
-    double CR = circumradius(P0, P1, P2);
-    double alpha;
+    double CR, alpha, arc_length;
+    CR = circumradius(P0, P1, P2);
     circum_alpha(P0, P1, P2, &alpha);
-    double arc_length = CR * alpha;
+    arc_length = CR * alpha;
     return arc_length;
 }
 
-Eigen::VectorXd Robi::linspace(double start, double end, int num) {
-    Eigen::VectorXd linspace(num);
-    double step = (end - start) / (num - 1);
-    for (int i = 0; i < num; ++i) {
-        linspace(i) = start + step * i;
-    }
-    return linspace;
-}
+//Eigen::VectorXd Robi::linspace(double start, double end, int num) {
+//    Eigen::VectorXd linspace(num);
+//    double step = (end - start) / (num - 1);
+//    for (int i = 0; i < num; ++i) {
+//        linspace(i) = start + step * i;
+//    }
+//    return linspace;
+//}
 
 ARCCode_t Robi::for_kin(Eigen::Array<double, 6, 1> angles, bool in_rads, bool out_rads, Eigen::Array<double, 6, 1> *xyzabc, Eigen::Affine3d *t16){
     Eigen::Vector3d trans1, trans2, trans3, trans4, trans5, trans6, xyz, abc;
@@ -304,7 +321,7 @@ ARCCode_t Robi::for_kin(Eigen::Array<double, 6, 1> angles, bool in_rads, bool ou
     trans6 << this->a6x, 0, 0;
 
     if (in_rads == false)
-        angles = angles * M_PI / 180;
+        angles *= DEG_TO_RAD;
 
     rot1 = this->rotz(angles[0]);
     rot2 = this->roty(angles[1]);
@@ -333,7 +350,7 @@ ARCCode_t Robi::for_kin(Eigen::Array<double, 6, 1> angles, bool in_rads, bool ou
             atan2( r16(1,0),r16(0,0));
 
     if (out_rads == false)
-        abc = abc * 180 / M_PI;
+        abc *= RAD_TO_DEG;
 
     *xyzabc << xyz, abc;
 
@@ -349,15 +366,13 @@ ARCCode_t Robi::inv_kin(Eigen::Array<double, 6, 1> xyzabc, bool front_pose, bool
     y = xyzabc(1);
     z = xyzabc(2);
         
-    if (in_rads == true){
-        a = xyzabc(3);
-        b = xyzabc(4);
-        c = xyzabc(5);
-    }
-    else{
-        a = rads(xyzabc(3));
-        b = rads(xyzabc(4));
-        c = rads(xyzabc(5));
+    a = xyzabc(3);
+    b = xyzabc(4);
+    c = xyzabc(5);
+    if (in_rads == false){
+        a *= DEG_TO_RAD;
+        b *= DEG_TO_RAD;
+        c *= DEG_TO_RAD;
     }
 
     TCPxyz << x, y, z;
@@ -427,7 +442,7 @@ ARCCode_t Robi::inv_kin(Eigen::Array<double, 6, 1> xyzabc, bool front_pose, bool
     *joint << j1,j2,j3,j4,j5,j6;
     
     if (out_rads == false)
-        *joint = *joint * 180 / M_PI;
+        *joint *= RAD_TO_DEG;
     
     return ARC_CODE_OK;
 }
@@ -440,6 +455,14 @@ ARCCode_t Robi::Jacobian(Eigen::Array<double, 6, 1> thetas, bool in_rads, Eigen:
     j4 = thetas[3];
     j5 = thetas[4];
     j6 = thetas[5];
+    if (in_rads == false){
+        j1 *= DEG_TO_RAD;
+        j2 *= DEG_TO_RAD;
+        j3 *= DEG_TO_RAD;
+        j4 *= DEG_TO_RAD;
+        j5 *= DEG_TO_RAD;
+        j6 *= DEG_TO_RAD;
+    }
 
     Eigen::Matrix<double, 6, 6> jacobian;
         
@@ -539,11 +562,15 @@ void Robi::test(){
     Eigen::VectorXd accel_limits(6);
     speed_limits << 10,10,10,10,10,10;
     accel_limits << 10,10,10,10,10,10;
-    speed_limits = speed_limits * M_PI / 180;
-    accel_limits = accel_limits * M_PI / 180;
+    speed_limits *= DEG_TO_RAD;
+    accel_limits *= DEG_TO_RAD;
 
-    Eigen::VectorXd s(500);
-    s = this->linspace(0,1,N);
+    //Eigen::VectorXd s(500);
+    //s = this->linspace(0,1,N);
+    Eigen::VectorXd s;
+    s.setLinSpaced(N,0,1);
+    std::cout << "s: " << std::endl << s << std::endl;
+
 
     double x1, y1, z1, a1, b1, c1;
     double x2, y2, z2;
@@ -571,8 +598,8 @@ void Robi::test(){
     Eigen::Vector3d euler2;
     euler1 << a1,b1,c1;
     euler2 << a3,b3,c3;
-    euler1 = euler1 * M_PI / 180.0;
-    euler2 = euler2 * M_PI / 180.0;
+    euler1 *= DEG_TO_RAD;
+    euler2 *= DEG_TO_RAD;
 
     Eigen::Vector3d P0;
     Eigen::Vector3d P1;
@@ -595,6 +622,13 @@ void Robi::test(){
     double L = this->arc_length(P0,P1,P2);
     std::cout << "L: " << L << std::endl;
 
-    Eigen::MatrixXd xyzs0 = this->circular_path(CC, CR, U, V, s);
+    Eigen::MatrixXd xyzs0 = this->circular_path(CC, CR, U, V, s*alpha);
     std::cout << "xyzs0: " << std::endl << xyzs0 << std::endl;
+
+    Eigen::MatrixXd abcs0 = slerp(euler1, euler2, s, true, true);
+    std::cout << "abcs0: " << std::endl << abcs0 << std::endl;
+
+    Eigen::MatrixXd xyzabcs0(xyzs0.rows(), xyzs0.cols() + abcs0.cols());
+    xyzabcs0 << xyzs0, abcs0;
+    std::cout << "xyzabcs0: " << std::endl << xyzabcs0 << std::endl;
 }
