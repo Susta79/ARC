@@ -24,289 +24,109 @@ void Robi::init(double a1z, double a2x, double a2z, double a3z, double a4z, doub
     this->a6x = a6x;
 }
 
-Eigen::Matrix3d Robi::rotx(double angle){
-    Eigen::Matrix3d R;
-    //R << 1, 0, 0,
-    //    0, cos(angle), -sin(angle),
-    //    0, sin(angle), cos(angle);
-    R = Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitX()).toRotationMatrix();
-    return R;
-}
-
-Eigen::Matrix3d Robi::roty(double angle){
-    Eigen::Matrix3d R;
-    //R << cos(angle), 0, sin(angle),
-    //    0, 1, 0,
-    //    -sin(angle), 0, cos(angle);
-    R = Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitY()).toRotationMatrix();
-    return R;
-}
-
-Eigen::Matrix3d Robi::rotz(double angle){
-    Eigen::Matrix3d R;
-    //R << cos(angle), -sin(angle), 0,
-    //    sin(angle), cos(angle), 0,
-    //    0, 0, 1;
-    R = Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitZ()).toRotationMatrix();
-    return R;
-}
-
-//double Robi::rads_d(double angle){
-//    return angle * RAD_TO_DEG;
-//}
-//
-//double Robi::degs_d(double angle){
-//    return angle * DEG_TO_RAD;
-//}
-//
-//Eigen::Vector3d Robi::rads_vec3d(Eigen::Vector3d vec){
-//    return vec * M_PI / 180.0;
-//}
-//
-//Eigen::Vector3d Robi::degs_vec3d(Eigen::Vector3d vec){
-//    return vec * 180.0 / M_PI;
-//}
-//
-//Eigen::MatrixXd Robi::rads_matXd(Eigen::MatrixXd mat){
-//    return mat * M_PI / 180.0;
-//}
-//
-//Eigen::MatrixXd Robi::degs_matXd(Eigen::MatrixXd mat){
-//    return mat * 180.0 / M_PI;
-//}
-//
-//Eigen::Array<double, 6, 1> rads_arr6d(Eigen::Array<double, 6, 1> angles){
-//    return angles * M_PI / 180.0;
-//}
-//
-//Eigen::Array<double, 6, 1> degs_arr6d(Eigen::Array<double, 6, 1> angles){
-//    return angles * 180.0 / M_PI;
-//}
-
-Eigen::Affine3d Robi::trans_mat(Eigen::Matrix3d rot, Eigen::Vector3d trans){
-    Eigen::Affine3d T;
-    T.linear() = rot;
-    T.translation() = trans;
-    return T;
-}
-
-// Orientation functions
-Eigen::Matrix3d Robi::rot_mat_from_euler(Eigen::Vector3d euler, bool in_rads){
-    if (in_rads == false)
-        euler *= DEG_TO_RAD;
-    double a = euler(0);
-    double b = euler(1);
-    double c = euler(2);
-    Eigen::Matrix3d R = rotz(c) * roty(b) * rotx(a) ;
-    return R;
-}
-
-Eigen::Quaterniond Robi::q_from_rot_mat(Eigen::Matrix3d R){
-    //Eigen::Quaterniond q;
-    //double coeff;
-    //q.w() =.5*sqrt(1 + R(0,0) + R(1,1) + R(2,2));
-    //coeff = .25*(1/q.w());
-    //q.x() = coeff*(R(2,1) - R(1,2));
-    //q.y() = coeff*(R(0,2) - R(2,0));
-    //q.z() = coeff*(R(1,0)- R(0,1));
-    Eigen::Quaterniond q(R);
-    return q;
-}
-
-Eigen::Matrix3d Robi::rot_mat_from_q(Eigen::Quaterniond q){
-    Eigen::Matrix3d R;
-    R = q.normalized().toRotationMatrix();
-    return R;
-}
-
-Eigen::Vector3d Robi::euler_from_rot_mat(Eigen::Matrix3d R, bool out_rads){
-    double a = atan2(R(2,1),R(2,2));
-    double b = atan2(-R(2,0), sqrt(1-pow(R(2,0),2)));
-    double c = atan2( R(1,0),R(0,0));
-    Eigen::Vector3d euler;
-    euler << a, b, c;
-    if (out_rads == false)
-        euler *= RAD_TO_DEG;
-    return euler;
-}
-
-double Robi::alpha_slerp(Eigen::Quaterniond q1, Eigen::Quaterniond q2, bool out_rads){
-    double alpha;
-    //double dot = q1.dot(q2);
-    //double lq1 = q1.norm();
-    //double lq2 = q2.norm();
-    //if (dot<0){
-    //    q1.coeffs() = -q1.coeffs();
-    //    dot = q1.dot(q2);
-    //}
-    //double alpha = acos(dot/(lq1*lq2));
-    alpha = q1.angularDistance(q2);
-    if (out_rads == false)
-        alpha *= RAD_TO_DEG;
-    return alpha;
-}
-
-Eigen::MatrixXd Robi::slerp(Eigen::Vector3d euler_array1, Eigen::Vector3d euler_array2, Eigen::VectorXd s, bool in_rads, bool out_rads){
-    Eigen::Quaterniond q1, q2, qSlerp;
-    Eigen::Vector3d euler;
-    Eigen::Matrix3d R, R1, R2;
-    R1 = rot_mat_from_euler(euler_array1, in_rads = in_rads);
-    R2 = rot_mat_from_euler(euler_array2, in_rads = in_rads);
-
-    q1 = q_from_rot_mat(R1);
-    q2 = q_from_rot_mat(R2);
+ARCCode_t Robi::interp_value(double si, Eigen::ArrayXd s_array, Eigen::ArrayXd val_array, double *val, int *idx){
+    int _idx;
+    double _val, ds, N;
+    N = s_array.size();
+    Eigen::ArrayXd s_array_si = (s_array - si).abs();
+    s_array_si.minCoeff(&_idx);
     
-    int len_s = s.size();
-    Eigen::MatrixXd euler_array(len_s,3);
-    for (size_t i = 0; i < len_s; i++){
-        qSlerp = q1.slerp(s(i), q2);
-        R = rot_mat_from_q(qSlerp);
-        euler = euler_from_rot_mat(R, out_rads);
-        euler_array.row(i) << euler(0), euler(1), euler(2);
-        //euler_array(i,0) = euler(0);
-        //euler_array(i,1) = euler(1);
-        //euler_array(i,2) = euler(2);
+    if (s_array(_idx) == si)
+        _val = val_array(_idx);
+    
+    if (s_array(_idx) > si){
+        ds = s_array(_idx) - s_array(_idx-1);
+        _val = (s_array(_idx)-si)*val_array(_idx-1)/ds + (si- s_array(_idx-1))*val_array(_idx)/ds;
     }
-    
-    /*
-    double alpha = alpha_slerp(q1, q2, out_rads = true);
 
-    Eigen::Quaterniond q;
-    for (size_t i = 0; i < len_s; i++)
+    if (s_array(_idx) < si){
+        ds = s_array(_idx+1)- s_array(_idx);
+        _val = (si - s_array(_idx))*val_array(_idx+1)/ds + (s_array(_idx+1)-si)*val_array(_idx)/ds;
+    }
+
+    *val = _val;
+    *idx = _idx;
+
+    return ARC_CODE_OK;
+}
+
+//def sd_limits_J(s_array, speed_limits, xyzabcs0, path_func, euler1, euler2, robot_obj,lr = .95, k =5, alpha = None, pose = [True, True]):
+// path_func: 1=circle, 2=linear, 3=bezier
+/*
+ARCCode_t Robi::sd_limits_J(Eigen::ArrayXd s_array, Eigen::ArrayXd speed_limits, Eigen::MatrixXd xyzabcs0, int path_func, Eigen::Vector3d euler1, Eigen::Vector3d euler2, Robi *robot_obj, double lr, int k, double alpha, bool front_pose, bool up_pose){
+    Eigen::Array<double, 6, 1> xyzabc0, thetas0, xyzabc1;
+    Eigen::Array<bool, 6, 1> violations;
+    Eigen::Matrix<double, 6, 6> J, Jinv;
+    Eigen::MatrixXd abc1;
+    Eigen::Vector3d xyz1;
+    double N, s0, s1, ds;
+    ARCCode_t ret;
+    N = s_array.size();
+
+    Eigen::MatrixXd sd_limit_curve(1,N); // array to store sd limit curve
+    sd_limit_curve.setZero();
+
+    //sd_limit_curve = np.zeros([1,N]) ## array to store sd limit curve
+
+    //sd_limit_accels = np.zeros([1,N])
+    for (size_t i = 0; i < N; i++)
     {
-        q.coeffs() = (sin(alpha*(1-i))/sin(alpha))*q1.coeffs() + (sin(alpha*i)/sin(alpha))*q2.coeffs();
-        R = rot_mat_from_q(q);
-        euler = euler_from_rot_mat(R, out_rads);
-        euler_array(i,0) = euler(0);
-        euler_array(i,1) = euler(1);
-        euler_array(i,2) = euler(2);
-    }
-    */
+        s1 = 1.0;
+        xyzabc0 = xyzabcs0(i);
+        ret = robot_obj->inv_kin(xyzabc0, front_pose, up_pose, true, true, &thetas0);
+        if (ret != ARC_CODE_OK)
+            return ret;
+        
+        ret = robot_obj->Jacobian(thetas0, true, &J);
+        Jinv = J.inverse();
 
-    if (out_rads == false)
-        euler_array *= RAD_TO_DEG;
+        violations << true, true, true, true, true, true;
+
+        while (true)
+        {
+            s0 = s_array(i);
+            ds = s1-s0;
+
+            switch (path_func)
+            {
+            case 2: //linear
+                xyz1 = robot_obj->linear_path_lambda(xyzabcs0(i).head(3), xyzabcs0(i).tail(3), Eigen::ArrayXd::LinSpaced(2, s0, s1));
+                break;
+            
+            default:
+                break;
+            }
+            //if alpha is not None: 
+            //    xyz1 = path_func(s1*alpha)
+            //else:
+            //    xyz1 = path_func(s1)  
+            Eigen::VectorXd s_1(1);
+            s_1 << s1;
+            abc1 = robot_obj->slerp(euler1, euler2, s_1, true, true);
+            //xyzabc1 = np.concatenate([xyz1,abc1], axis = 1)[0]
+            xyzabc1.row(0) << xyz1(0), abc1(0);
+
+            dXtcpdt = (xyzabc1-xyzabc0)/dt
+            speeds = np.abs(Jinv@dXtcpdt)
+
+            violations = np.greater(speeds, speed_limits)
+            s1 = s0 + (ds)*lr
+
+        }
+        
+
+        while True in violations:
+        sd =  (ds)/dt
+
+        sd_limit_curve[0,i] = sd
+    }
     
-    return euler_array;
+
+    sd_limit_curve = running_mean_filter(sd_limit_curve, k = k)[0]
+    
+    return sd_limit_curve
 }
-
-//path functions
-Eigen::Vector3d Robi::circumcenter(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2){
-    Eigen::Vector3d cc;
-    double a = (P2-P1).dot(P2-P1);
-    double b = (P0-P2).dot(P0-P2);
-    double c = (P1-P0).dot(P1-P0);        
-    cc = ((a)*(b+c-a)*P0 + b*(c+a-b)*P1 +c*(a+b-c)*P2)/((a)*(b+c-a) + b*(c+a-b) + c*(a+b-c));
-    return cc;
-}
-
-Eigen::Vector3d Robi::circumcenter2(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2){
-    double CR = circumradius(P0, P1, P2);
-    Eigen::Vector3d y = (P0-P1).cross(P2-P1);
-    Eigen::Vector3d z = y.cross(P0-P1);
-    z = z.normalized();
-    Eigen::Vector3d x = sqrt(pow(CR, 2) - (1/4)*pow((P0-P1).norm(), 2)) * z;
-    Eigen::Vector3d CC = (P0+P1)/2 + x;
-    return CC;
-}
-
-Eigen::Vector3d Robi::circumcenter3(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2){
-    double denom = 2 * pow((P0-P1).cross(P1-P2).norm(), 2);
-    double alpha = pow((P1-P2).norm(), 2) * (P0-P1).dot(P0-P2);
-    double beta = pow((P0-P2).norm(), 2) * (P1-P0).dot(P1-P2);
-    double gamma = pow((P0-P1).norm(), 2) * (P2-P1).dot(P2-P0);
-    Eigen::Vector3d CC = (alpha*P0 + beta*P1 + gamma*P2) / denom;
-    return CC;
-}
-
-double Robi::circumradius(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2){
-    double a = (P0-P1).norm();
-    double b = (P1-P2).norm();
-    double c = (P2-P0).norm();
-    double cr = a*b*c/ (2*(P0-P1).cross(P1-P2).norm());
-    return cr;
-}
-
-ARCCode_t Robi::circle_params(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, Eigen::Vector3d *CC, double *CR, Eigen::Vector3d *U, Eigen::Vector3d *V, double *alpha){
-    *CC = circumcenter(P0, P1, P2);
-    *CR = circumradius(P0,P1,P2);
-    Eigen::Vector3d v01 = P1-P0;
-    Eigen::Vector3d v12 = P2-P1;
-    Eigen::Vector3d N = v01.cross(v12);
-    if (N(0) == 0 and N(1)==0 and N(2) ==0)
-        return ARC_ERR_APP_CIRC_POINTS_COLLIN;
-
-    N.normalize();
-    *U = P0 - *CC;
-    U->normalize();
-    *V = N.cross(*U);
-
-    Eigen::Vector3d vc0 = P0 - *CC;
-    Eigen::Vector3d vc2 = P2 - *CC;
-
-    *alpha = acos(vc0.dot(vc2)/(vc0.norm()*vc2.norm()));
-
-    if (abs(vc0.dot(vc0)) != 1){
-        Eigen::Vector3d cross1 = vc0.cross(vc2);
-        cross1.normalize();
-        if (N.dot(cross1) < 0)
-            *alpha = M_2_PI - *alpha;
-    }
-
-    return ARC_CODE_OK;
-}
-
-ARCCode_t Robi::circum_alpha(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, double *alpha){
-    Eigen::Vector3d CC = circumcenter(P0,P1,P2);
-    Eigen::Vector3d v01 = P1-P0;
-    Eigen::Vector3d v12 = P2-P1;
-    Eigen::Vector3d N = v01.cross(v12);
-    if (N(0) == 0 and N(1)==0 and N(2) ==0)
-        return ARC_ERR_APP_CIRC_POINTS_COLLIN;
-
-    Eigen::Vector3d vc0 = P0-CC;
-    Eigen::Vector3d vc2 = P2-CC;
-
-    *alpha = acos(vc0.dot(vc2)/(vc0.norm()*vc2.norm()));
-
-    if (abs(vc0.dot(vc0)) != 1){
-        Eigen::Vector3d cross1 = vc0.cross(vc2);
-        cross1.normalize();
-        if (N.dot(cross1) < 0)
-            *alpha = M_2_PI - *alpha;
-    }
-
-    return ARC_CODE_OK;
-}
-
-Eigen::MatrixXd Robi::circular_path(Eigen::Vector3d CC, double CR, Eigen::Vector3d U, Eigen::Vector3d V, Eigen::VectorXd s){
-    int len_s = s.size();
-    Eigen::Vector3d xyz;
-    Eigen::MatrixXd xyz_array(len_s,3);
-    for (size_t i = 0; i < len_s; i++){
-        xyz = CC + CR*cos(s(i))*U + CR*sin(s(i))*V;
-        xyz_array.row(i) << xyz(0), xyz(1), xyz(2);
-    }
-    return xyz_array;
-}
-
-//def circular_path_lambda(CC, CR,U,V):
-//    return lambda theta: np.array([CC + CR*np.cos(theta)*U + CR*np.sin(theta)*V])
-double Robi::arc_length(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2){
-    double CR, alpha, arc_length;
-    CR = circumradius(P0, P1, P2);
-    circum_alpha(P0, P1, P2, &alpha);
-    arc_length = CR * alpha;
-    return arc_length;
-}
-
-//Eigen::VectorXd Robi::linspace(double start, double end, int num) {
-//    Eigen::VectorXd linspace(num);
-//    double step = (end - start) / (num - 1);
-//    for (int i = 0; i < num; ++i) {
-//        linspace(i) = start + step * i;
-//    }
-//    return linspace;
-//}
+*/
 
 ARCCode_t Robi::for_kin(Eigen::Array<double, 6, 1> angles, bool in_rads, bool out_rads, Eigen::Array<double, 6, 1> *xyzabc, Eigen::Affine3d *t16){
     Eigen::Vector3d trans1, trans2, trans3, trans4, trans5, trans6, xyz, abc;
@@ -323,12 +143,12 @@ ARCCode_t Robi::for_kin(Eigen::Array<double, 6, 1> angles, bool in_rads, bool ou
     if (in_rads == false)
         angles *= DEG_TO_RAD;
 
-    rot1 = this->rotz(angles[0]);
-    rot2 = this->roty(angles[1]);
-    rot3 = this->roty(angles[2]);
-    rot4 = this->rotx(angles[3]);
-    rot5 = this->roty(angles[4]);
-    rot6 = this->rotx(angles[5]);
+    rot1 = rotz(angles[0]);
+    rot2 = roty(angles[1]);
+    rot3 = roty(angles[2]);
+    rot4 = rotx(angles[3]);
+    rot5 = roty(angles[4]);
+    rot6 = rotx(angles[5]);
 
     t1 = trans_mat(rot1, trans1);
     t2 = trans_mat(rot2, trans2);
@@ -512,123 +332,4 @@ ARCCode_t Robi::Jacobian(Eigen::Array<double, 6, 1> thetas, bool in_rads, Eigen:
     *J = jacobian;
 
     return ARC_CODE_OK;
-}
-
-void Robi::test(){
-    // link dimensions of the robot in mm
-    double a1x = 0;
-    double a1y = 0;
-    double a1z = 650;
-
-    double a2x = 400;
-    double a2y = 0;
-    double a2z = 680;
-
-    double a3x = 0;
-    double a3y = 0;
-    double a3z = 1100;
-
-    double a4x = 766;
-    double a4y = 0;
-    double a4z = 230;
-
-    double a5x = 345;
-    double a5y = 0;
-    double a5z = 0;
-
-    double a6x = 244;
-    double a6y = 0;
-    double a6z = 0;
-
-    double a7x = 1;
-    double a7y = 0;
-    double a7z = 0;
-
-    Eigen::Vector3d offset;
-    offset << 0,0,a1z;
-
-    this->init(a1z, a2x, a2z, a3z, a4z, a4x, a5x, a6x);
-
-
-    // parameters for determining optimal trajectory
-    double N = 500;
-    double lr = .995;
-
-    double fr = 20;
-    double dt = 1/fr;
-    double buffer = 10;
-
-    Eigen::VectorXd speed_limits(6);
-    Eigen::VectorXd accel_limits(6);
-    speed_limits << 10,10,10,10,10,10;
-    accel_limits << 10,10,10,10,10,10;
-    speed_limits *= DEG_TO_RAD;
-    accel_limits *= DEG_TO_RAD;
-
-    //Eigen::VectorXd s(500);
-    //s = this->linspace(0,1,N);
-    Eigen::VectorXd s;
-    s.setLinSpaced(N,0,1);
-    std::cout << "s: " << std::endl << s << std::endl;
-
-
-    double x1, y1, z1, a1, b1, c1;
-    double x2, y2, z2;
-    double x3, y3, z3, a3, b3, c3;
-    
-    x1 = 100;
-    y1 = 1500;
-    z1 = 1000;
-    a1 = 50;
-    b1 = 50;
-    c1 = 50;
-
-    x2 = 200;
-    y2 = 100;
-    z2 = 500;
-
-    x3 = 200;
-    y3 = 0;
-    z3 = 0;
-    a3 = 250;
-    b3 = 0;
-    c3 = -90;
-
-    Eigen::Vector3d euler1;
-    Eigen::Vector3d euler2;
-    euler1 << a1,b1,c1;
-    euler2 << a3,b3,c3;
-    euler1 *= DEG_TO_RAD;
-    euler2 *= DEG_TO_RAD;
-
-    Eigen::Vector3d P0;
-    Eigen::Vector3d P1;
-    Eigen::Vector3d P2;
-    P0 << x1,y1,z1;
-    P1 << x2,y2,z2;
-    P2 << x3,y3,z3;
-    Eigen::Vector3d CC, U, V;
-    double CR, alpha;
-    if (this->circle_params(P0, P1, P2, &CC, &CR, &U, &V, &alpha) != ARC_CODE_OK)
-        std::cout << "Error" << std::endl;
-    else{
-        std::cout << "CC: " << CC.transpose() << std::endl;
-        std::cout << "CR: " << CR << std::endl;
-        std::cout << "U: " << U.transpose() << std::endl;
-        std::cout << "V: " << V.transpose() << std::endl;
-        std::cout << "alpha: " << alpha << std::endl;
-    }
-
-    double L = this->arc_length(P0,P1,P2);
-    std::cout << "L: " << L << std::endl;
-
-    Eigen::MatrixXd xyzs0 = this->circular_path(CC, CR, U, V, s*alpha);
-    std::cout << "xyzs0: " << std::endl << xyzs0 << std::endl;
-
-    Eigen::MatrixXd abcs0 = slerp(euler1, euler2, s, true, true);
-    std::cout << "abcs0: " << std::endl << abcs0 << std::endl;
-
-    Eigen::MatrixXd xyzabcs0(xyzs0.rows(), xyzs0.cols() + abcs0.cols());
-    xyzabcs0 << xyzs0, abcs0;
-    std::cout << "xyzabcs0: " << std::endl << xyzabcs0 << std::endl;
 }

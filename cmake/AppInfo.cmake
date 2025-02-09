@@ -31,6 +31,14 @@ set(SOURCE_FILES
     src/tcpclient.h
     src/robi.cpp
     src/robi.h
+    src/path.cpp
+    src/path.h
+    src/path_linear.cpp
+    src/path_linear.h
+    src/path_circular.cpp
+    src/path_circular.h
+    src/global.cpp
+    src/global.h
     include/ARC/error_def.h
 )
 

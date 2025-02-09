@@ -1,7 +1,10 @@
 #ifndef KINEMATIC_H
 #define KINEMATIC_H
 
+#include "global.h"
+
 #include "robi.h"
+#include "path_circular.h"
 
 #include <QDialog>
 #include <QLabel>
@@ -9,14 +12,10 @@
 #include <QFormLayout>
 #include <QPushButton>
 
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
-
 class Kinematic : public QDialog {
 private:
     QLabel *lbTitle;
     QPushButton *pbPushButton;
-    Robi *robi;
 
 private slots:
     void pbPushButton_released();
@@ -24,6 +23,7 @@ private slots:
 public:
     explicit Kinematic(QWidget *parent = 0);
     ~Kinematic();
+    void test();
 };
 
 #endif // KINEMATIC_H
