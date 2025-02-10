@@ -14,16 +14,7 @@ protected:
     double dt;
 
 public:
-    //Path();
-    Path(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d euler0, Eigen::Vector3d euler1, double N, double dt){
-        this->P0 = P0;
-        this->P1 = P1;
-        this->euler0 = euler0;
-        this->euler1 = euler1;
-        this->N = N;
-        this->dt = dt;
-        s.setLinSpaced(N,0,1);
-    }
+    Path(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d euler0, Eigen::Vector3d euler1, double N, double dt);
     //~Path();
 
     // P0
@@ -50,12 +41,10 @@ public:
     double get_dt(){ return this->dt; }
     void set_dt(double dt){ this->dt = dt; }
 
-    Eigen::MatrixXd slerp(bool in_rads, bool out_rads);
-
     // virtual functions
     virtual ARCCode_t path_lenght(double *lenght) {*lenght = 0.0; return ARC_CODE_OK;};
     virtual Eigen::MatrixXd xyz_array() {return Eigen::MatrixXd(0,0);};
-    //virtual Eigen::MatrixXd slerp(bool in_rads, bool out_rads);
+    virtual Eigen::MatrixXd slerp(bool in_rads, bool out_rads) {return Eigen::MatrixXd(0,0);};
 };
 
 #endif // PATH_H

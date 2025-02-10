@@ -19,3 +19,7 @@ Alla fine devo dare la scelta del tipo di traiettoria (profilo di movimento):
 - Curca a S (curva a 7 segmenti).
 - Bezier.
 - Ottimizzato.
+
+
+2025.02.10
+Split the slerp of the circular path into 2 different parts (maybe 1 or 3 parts depending on the angle).

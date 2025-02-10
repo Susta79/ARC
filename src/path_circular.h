@@ -51,6 +51,7 @@ public:
     Path_circular(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, Eigen::Vector3d euler0, Eigen::Vector3d euler1, double N, double dt);
     ARCCode_t path_lenght(double *arc_length);
     Eigen::MatrixXd xyz_array();
+    Eigen::MatrixXd slerp(bool in_rads, bool out_rads);
 };
 
 #endif // PATH_CIRCULAR_H
