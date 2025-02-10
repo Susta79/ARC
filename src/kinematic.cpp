@@ -139,10 +139,10 @@ void Kinematic::test(){
         std::cout << "L: " << L << std::endl;
 
     Eigen::MatrixXd xyzs0 = path_circular->xyz_array();
-    std::cout << "xyzs0: " << std::endl << xyzs0 << std::endl;
+    //std::cout << "xyzs0: " << std::endl << xyzs0 << std::endl;
 
     Eigen::MatrixXd abcs0 = path_circular->slerp(true, true);
-    std::cout << "abcs0: " << std::endl << abcs0 << std::endl;
+    //std::cout << "abcs0: " << std::endl << abcs0 << std::endl;
 
     Eigen::MatrixXd xyzabcs0(xyzs0.rows(), xyzs0.cols() + abcs0.cols());
     xyzabcs0 << xyzs0, abcs0;

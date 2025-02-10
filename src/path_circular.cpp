@@ -17,6 +17,23 @@ Path_circular::Path_circular(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vect
         this->alpha = 0.0;
         return;
     }
+
+    NN.normalize();
+    this->U = (this->P0 - this->CC);
+    this->U = this->U / this->U.norm();
+    this->V = NN.cross(this->U);
+
+    vc0 = this->P0 - this->CC;
+    vc2 = this->P2 - this->CC;
+
+    this->alpha = acos(vc0.dot(vc2)/(vc0.norm()*vc2.norm()));
+
+    if (abs(vc0.dot(vc0)) != 1){
+        cross1 = vc0.cross(vc2);
+        cross1.normalize();
+        if (NN.dot(cross1) < 0)
+        this->alpha = M_2_PI - this->alpha;
+    }
 }
 
 double Path_circular::alpha_slerp(Eigen::Quaterniond q1, Eigen::Quaterniond q2, bool out_rads){
