@@ -80,7 +80,7 @@ void Kinematic::test(){
     accel_limits *= DEG_TO_RAD;
 
     double x0, y0, z0, a0, b0, c0;
-    double x1, y1, z1;
+    double x1, y1, z1, a1, b1, c1;
     double x2, y2, z2, a2, b2, c2;
     
     x0 = 100;
@@ -93,6 +93,9 @@ void Kinematic::test(){
     x1 = 200;
     y1 = 100;
     z1 = 500;
+    a1 = 100;
+    b1 = 0;
+    c1 = 0;
 
     x2 = 200;
     y2 = 0;
@@ -105,11 +108,13 @@ void Kinematic::test(){
     Eigen::Vector3d P1(x1, y1, z1);
     Eigen::Vector3d P2(x2, y2, z2);
     Eigen::Vector3d euler0(a0, b0, c0);
+    Eigen::Vector3d euler1(a1, b1, c1);
     Eigen::Vector3d euler2(a2, b2, c2);
     euler0 *= DEG_TO_RAD;
+    euler1 *= DEG_TO_RAD;
     euler2 *= DEG_TO_RAD;
 
-    Path_circular *path_circular = new Path_circular(P0, P1, P2, euler0, euler2, N, dt);
+    Path_circular *path_circular = new Path_circular(P0, P1, P2, euler0, euler1, euler2, N, dt);
     std::cout << "CC: " << path_circular->get_CC().transpose() << std::endl;
     std::cout << "CR: " << path_circular->get_CR() << std::endl;
     std::cout << "U: " << path_circular->get_U().transpose() << std::endl;
@@ -130,7 +135,13 @@ void Kinematic::test(){
 
     Eigen::MatrixXd xyzabcs0(xyzs0.rows(), xyzs0.cols() + abcs0.cols());
     xyzabcs0 << xyzs0, abcs0;
-    std::cout << "xyzabcs0: " << std::endl << xyzabcs0 << std::endl;
+    //std::cout << "xyzabcs0: " << std::endl << xyzabcs0 << std::endl;
+    std::cout << "xyzabcs0: " << std::endl;
+    for (size_t i = 0; i < xyzabcs0.rows(); i++)
+    {
+        std::cout << "i: " << i << "; " << xyzabcs0.row(i) << std::endl;
+    }
+    
 
     delete robi;
 }

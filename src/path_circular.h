@@ -7,11 +7,15 @@ class Path_circular : public Path
 {
 protected:
     Eigen::Vector3d P2;
+    Eigen::Vector3d euler2;
     Eigen::Vector3d CC;
     double CR;
     Eigen::Vector3d U;
     Eigen::Vector3d V;
+    // alpha: Angle in radians between (P2-CC) and (P0-CC)
     double alpha;
+    // alpha1: Angle in radians between (P1-CC) and (P0-CC)
+    double alpha1;
 
     Eigen::Vector3d circumcenter();
     double circumradius();
@@ -26,6 +30,10 @@ public:
     // P2
     Eigen::Vector3d get_P2(){ return this->P2; }
     void set_P2(Eigen::Vector3d P2){ this->P2 = P2; }
+
+    // euler2
+    Eigen::Vector3d get_euler2(){ return this->euler2; }
+    void set_euler2(Eigen::Vector3d euler2){ this->euler2 = euler2; }
 
     // CC
     Eigen::Vector3d get_CC(){ return this->CC; }
@@ -48,7 +56,7 @@ public:
     void set_alpha(double alpha){ this->alpha = alpha; }
 
     ARCCode_t circle_params(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2);
-    Path_circular(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, Eigen::Vector3d euler0, Eigen::Vector3d euler1, double N, double dt);
+    Path_circular(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, Eigen::Vector3d euler0, Eigen::Vector3d euler1, Eigen::Vector3d euler2, double N, double dt);
     ARCCode_t path_lenght(double *arc_length);
     Eigen::MatrixXd xyz_array();
     Eigen::MatrixXd slerp(bool in_rads, bool out_rads);
