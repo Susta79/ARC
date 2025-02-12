@@ -37,6 +37,10 @@ set(SOURCE_FILES
     src/path_linear.h
     src/path_circular.cpp
     src/path_circular.h
+    src/trajectory.cpp
+    src/trajectory.h
+    src/trajectory_scurve.cpp
+    src/trajectory_scurve.h
     src/global.cpp
     src/global.h
     include/ARC/error_def.h

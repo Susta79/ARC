@@ -19,6 +19,7 @@ protected:
 
     Eigen::Vector3d circumcenter();
     double circumradius();
+    // TODO: Divide slerp into 2 or 3 parts
     double alpha_slerp(Eigen::Quaterniond q1, Eigen::Quaterniond q2, bool out_rads);
     //path functions
     //Eigen::Vector3d circumcenter2(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2);

@@ -15,11 +15,15 @@ Cinematica
 4. movimento lineare completo (rototraslazione) con profilo di movimento Bezier. Lontano da singolarità.
 
 
-Alla fine devo dare la scelta del tipo di traiettoria (profilo di movimento):
-- Curca a S (curva a 7 segmenti).
-- Bezier.
-- Ottimizzato.
-
 
 2025.02.10
 Split the slerp of the circular path into 2 different parts (maybe 1 or 3 parts depending on the angle).
+
+2025.02.12
+Implement the spline path using the polinomial and the DeCasteliau formula.
+
+Implement the 3 different types of trajectory:
+- S-Curve
+- Sinusoidal
+- Bezier
+- Optimal trajectory
