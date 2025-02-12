@@ -5,3 +5,4 @@ Trajectory::~Trajectory(){
         delete this->path;
     path = NULL;
 };
+

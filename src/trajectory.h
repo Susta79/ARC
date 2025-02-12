@@ -14,7 +14,7 @@ protected:
     Path *path;
 
 public:
-    Trajectory(double Vmax){ this->Vmax = Vmax; };
+    Trajectory(double Vmax, Path *path){ this->Vmax = Vmax; this->path = path; };
     ~Trajectory();
 
     // Vmax

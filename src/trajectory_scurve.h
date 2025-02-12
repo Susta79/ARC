@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include "trajectory.h"
+#include "path.h"
 
 class Trajectory_scurve : public Trajectory {
     // S-Curve divided in 7 segments
@@ -11,10 +12,35 @@ protected:
     double Amax;
     // Max jerk in m/s^3
     double Jmax;
+    // Delta time
+    double dt1;
+    double dt2;
+    double dt3;
+    double dt4;
+    double dt5;
+    double dt6;
+    double dt7;
+    // Distance
+    double d1;
+    double d2;
+    double d3;
+    double d4;
+    double d5;
+    double d6;
+    double d7;
+    // Speed at the end of each segment
+    double v1;
+    double v2;
+    double v3;
+    double v4;
+    double v5;
+    double v6;
+    double v7;
 
 public:
-    Trajectory_scurve(double Vmax, double Amax, double Jmax) : Trajectory(Vmax){ this->Amax = Amax; this->Jmax = Jmax; };
+    Trajectory_scurve(double Vmax, double Amax, double Jmax, Path *path) : Trajectory(Vmax, path){ this->Amax = Amax; this->Jmax = Jmax; };
     //~Trajectory_scurve();
+    void process();
 
     // Amax
     double get_Amax(){ return this->Amax; }
