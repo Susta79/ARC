@@ -3,6 +3,7 @@
 // TODO: Implement this function
 double Trajectory_scurve::get_dist_at_t(double t){
     double dist = 0.0;
+    double dt;
     if (t <= 0)
         return 0.0;
     if (t <= this->dt1) {
@@ -10,15 +11,18 @@ double Trajectory_scurve::get_dist_at_t(double t){
         return dist;
     }
     if (t <= this->dt2) {
-        dist = this->v1 * (t - this->dt1) + (1.0 / 2.0) * this->Amax * pow(t - this->dt1, 2);
+        dt = t - this->dt1;
+        dist = this->v1 * dt + (1.0 / 2.0) * this->Amax * pow(dt, 2);
         return dist;
     }
     if (t <= this->dt3) {
-        dist = this->d1 + this->d2 + this->Vmax * this->dt1 - (1.0 / 6.0) * this->Jmax * pow(t - this->dt1 - this->dt2, 3);
+        dt = t - this->dt1 - this->dt2;
+        dist = this->d1 + this->d2 + this->Vmax * this->dt1 - (1.0 / 6.0) * this->Jmax * pow(dt, 3);
         return dist;
     }
     if (t <= this->dt4) {
-        dist = this->d1 + this->d2 + this->d3 + this->Vmax * (t - this->dt1 - this->dt2 - this->dt3);
+        dt = t - this->dt1 - this->dt2 - this->dt3;
+        dist = this->d1 + this->d2 + this->d3 + this->Vmax * dt;
         return dist;
     }
     // TODO: Complete
