@@ -7,6 +7,7 @@
 class Path_linear : public Path
 {
 public:
+    Path_linear(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d euler0, Eigen::Vector3d euler1, double N, double dt) : Path(P0, P1, euler0, euler1, N, dt){};
     ARCCode_t path_lenght(double *lenght);
     Eigen::MatrixXd xyz_array();
     Eigen::MatrixXd slerp(bool in_rads, bool out_rads);

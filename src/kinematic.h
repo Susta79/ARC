@@ -4,7 +4,8 @@
 #include "global.h"
 
 #include "robi.h"
-#include "path_circular.h"
+#include "path_linear.h"
+#include "trajectory_scurve.h"
 
 #include <QDialog>
 #include <QLabel>

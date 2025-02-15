@@ -38,17 +38,17 @@ protected:
     double v7;
 
 public:
-    Trajectory_scurve(double Vmax, double Amax, double Jmax, Path *path) : Trajectory(Vmax, path){ this->Amax = Amax; this->Jmax = Jmax; };
+    Trajectory_scurve(double Vmax, double Amax, double Jmax, Path *path);
     //~Trajectory_scurve();
-    void process();
+    ARCCode_t process();
 
     // Amax
     double get_Amax(){ return this->Amax; }
-    void set_Amax(double Amax){ this->Amax = Amax; }
+    void set_Amax(double Amax){ if (Amax > 0.1) this->Amax = Amax; else this->Amax = 0.1; }
 
     // Jmax
     double get_Jmax(){ return this->Jmax; }
-    void set_Jmax(double Jmax){ this->Jmax = Jmax; }
+    void set_Jmax(double Jmax){ if (Jmax > 0.1) this->Jmax = Jmax; else this->Jmax = 0.1; }
 
     // virtual functions
     double get_dist_at_t(double t);

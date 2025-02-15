@@ -83,6 +83,7 @@ void Kinematic::test(){
     double x1, y1, z1, a1, b1, c1;
     double x2, y2, z2, a2, b2, c2;
     
+    /*
     x0 = 100;
     y0 = 1500;
     z0 = 1000;
@@ -141,7 +142,40 @@ void Kinematic::test(){
     {
         std::cout << "i: " << i << "; " << xyzabcs0.row(i) << std::endl;
     }
+    */
     
+    x0 = 100;
+    y0 = 1500;
+    z0 = 1000;
+    a0 = 50;
+    b0 = 50;
+    c0 = 50;
 
+    x1 = 500;
+    y1 = -500;
+    z1 = 1000;
+    a1 = 250;
+    b1 = 0;
+    c1 = -90;
+
+    Eigen::Vector3d P0(x0, y0, z0);
+    Eigen::Vector3d P1(x1, y1, z1);
+    Eigen::Vector3d euler0(a0, b0, c0);
+    Eigen::Vector3d euler1(a1, b1, c1);
+    euler0 *= DEG_TO_RAD;
+    euler1 *= DEG_TO_RAD;
+
+    Path_linear *path_linear = new Path_linear(P0, P1, euler0, euler1, N, dt);
+    double L;
+    path_linear->path_lenght(&L);
+    std::cout << "L: " << L << std::endl;
+    Trajectory_scurve *trajectory_scurve = new Trajectory_scurve(2, 10, 100, path_linear);
+    double T = trajectory_scurve->get_T();
+    std::cout << "T: " << T << std::endl;
+    for (size_t i = 0; i <= T*1000; i+=5)
+    {
+        std::cout << "i: " << i << "; " << trajectory_scurve->get_dist_at_t((double)i/1000.0) << std::endl;
+    }
+    
     delete robi;
 }

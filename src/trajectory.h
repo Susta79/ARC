@@ -14,16 +14,16 @@ protected:
     Path *path;
 
 public:
-    Trajectory(double Vmax, Path *path){ this->Vmax = Vmax; this->path = path; };
+    Trajectory(double Vmax, Path *path);
     ~Trajectory();
 
     // Vmax
     double get_Vmax(){ return this->Vmax; }
-    void set_Vmax(double Vmax){ this->Vmax = Vmax; }
+    void set_Vmax(double Vmax){ if(Vmax > 0.001) this->Vmax = Vmax; else this->Vmax = 0.001; }
 
     // T
     double get_T(){ return this->T; }
-    void set_T(double T){ this->T = T; }
+    void set_T(double T){ if (T > 0) this->T = T; else this->T = 0.0; }
 
     // path
     Path *get_path(){ return this->path; }
