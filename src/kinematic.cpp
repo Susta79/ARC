@@ -172,9 +172,20 @@ void Kinematic::test(){
     Trajectory_scurve *trajectory_scurve = new Trajectory_scurve(2, 10, 100, path_linear);
     double T = trajectory_scurve->get_T();
     std::cout << "T: " << T << std::endl;
+    Eigen::Vector<double, 6> pose;
+    double dist;
+    ARCCode_t ret;
     for (size_t i = 0; i <= T*1000; i+=5)
     {
+        dist = trajectory_scurve->get_dist_at_t((double)i/1000.0);
         std::cout << "t: " << i/1000.0 << "; " << trajectory_scurve->get_dist_at_t((double)i/1000.0) << std::endl;
+        ret = path_linear->get_pose_at_s((dist / L), true, &pose);
+        if ( ret == ARC_CODE_OK ) {
+            QDebug("pose: ");
+            std::cout << "pose: " << pose << std::endl;
+        }
+        else
+            std::cout << "Error: " << ret << std::endl;
     }
     
     delete robi;

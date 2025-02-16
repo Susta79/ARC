@@ -201,3 +201,9 @@ Eigen::MatrixXd Path_circular::slerp(bool in_rads, bool out_rads){
     
     return euler_array;
 }
+
+// TODO: Complete
+ARCCode_t Path_circular::get_pose_at_s(double s, bool out_rads, Eigen::Vector<double, 6> *pose){
+    *pose << 0, 0, 0, 0, 0, 0;
+    return ARC_CODE_OK;
+}

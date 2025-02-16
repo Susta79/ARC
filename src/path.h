@@ -45,6 +45,7 @@ public:
     virtual ARCCode_t path_lenght(double *lenght) {*lenght = 0.0; return ARC_CODE_OK;};
     virtual Eigen::MatrixXd xyz_array() {return Eigen::MatrixXd(0,0);};
     virtual Eigen::MatrixXd slerp(bool in_rads, bool out_rads) {return Eigen::MatrixXd(0,0);};
+    virtual ARCCode_t get_pose_at_s(double s, bool out_rads, Eigen::Vector<double, 6> *pose) {*pose << 0, 0, 0, 0, 0, 0; return ARC_CODE_OK;};
 };
 
 #endif // PATH_H

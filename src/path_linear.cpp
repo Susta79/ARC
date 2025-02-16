@@ -47,3 +47,28 @@ Eigen::MatrixXd Path_linear::slerp(bool in_rads, bool out_rads){
 Eigen::Vector3d Path_linear::path_lambda(Eigen::Vector3d P0, Eigen::Vector3d P1, double s){
     return P0*(1-s)+ P1*s;
 }
+
+ARCCode_t Path_linear::get_pose_at_s(double s, bool out_rads, Eigen::Vector<double, 6> *pose){
+    Eigen::Quaterniond q0, q1, qSlerp;
+    Eigen::Vector3d P, euler;
+    Eigen::Matrix3d R, R0, R1;
+
+    P = this->P0*(1-s)+ this->P1*s;
+
+    R0 = rot_mat_from_euler(this->euler0, true);
+    R1 = rot_mat_from_euler(this->euler1, true);
+
+    q0 = q_from_rot_mat(R0);
+    q1 = q_from_rot_mat(R1);
+    
+    qSlerp = q0.slerp(s, q1);
+    R = rot_mat_from_q(qSlerp);
+    euler = euler_from_rot_mat(R, out_rads);
+
+    if (out_rads == false)
+        euler *= RAD_TO_DEG;
+    
+    *pose << P, euler;
+
+    return ARC_CODE_OK;
+}

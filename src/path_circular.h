@@ -61,6 +61,7 @@ public:
     ARCCode_t path_lenght(double *arc_length);
     Eigen::MatrixXd xyz_array();
     Eigen::MatrixXd slerp(bool in_rads, bool out_rads);
+    ARCCode_t get_pose_at_s(double s, bool out_rads, Eigen::Vector<double, 6> *pose);
 };
 
 #endif // PATH_CIRCULAR_H

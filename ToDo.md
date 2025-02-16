@@ -23,7 +23,8 @@ Split the slerp of the circular path into 2 different parts (maybe 1 or 3 parts 
 Implement the spline path using the polinomial and the DeCasteliau formula.
 
 Implement the 3 different types of trajectory:
-- S-Curve
+- S-Curve -> Done but to be completed with the special cases.
 - Sinusoidal
 - Bezier
-- Optimal trajectory
+
+Optimal trajectory
