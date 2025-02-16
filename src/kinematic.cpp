@@ -174,7 +174,7 @@ void Kinematic::test(){
     std::cout << "T: " << T << std::endl;
     for (size_t i = 0; i <= T*1000; i+=5)
     {
-        std::cout << "i: " << i << "; " << trajectory_scurve->get_dist_at_t((double)i/1000.0) << std::endl;
+        std::cout << "t: " << i/1000.0 << "; " << trajectory_scurve->get_dist_at_t((double)i/1000.0) << std::endl;
     }
     
     delete robi;

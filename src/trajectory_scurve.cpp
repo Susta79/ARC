@@ -31,40 +31,56 @@ Trajectory_scurve::Trajectory_scurve(double Vmax, double Amax, double Jmax, Path
     ret = this->process();
 }
 
-// TODO: Implement this function
 double Trajectory_scurve::get_dist_at_t(double t){
     double dist, dt;
+    double T1 = this->dt1;
+    double T2 = T1 + this->dt2;
+    double T3 = T2 + this->dt3;
+    double T4 = T3 + this->dt4;
+    double T5 = T4 + this->dt5;
+    double T6 = T5 + this->dt6;
+    double T7 = T6 + this->dt7;
+
     if (t <= 0) {
         dist = 0.0;
-    } else if (t <= this->dt1) {
+    }
+    if ((t > 0) && (t <= T1)) {
         dist = (1.0 / 6.0) * this->Jmax * pow(t, 3);
-    } else if (t <= this->dt2) {
-        dt = t - this->dt1;
+    }
+    if ((t > T1) && (t <= T2)) {
+        dt = t - T1;
         dist = this->v1 * dt + (1.0 / 2.0) * this->Amax * pow(dt, 2);
         dist += this->d1;
-    } else if (t <= this->dt3) {
-        dt = t - this->dt1 - this->dt2;
-        dist = (this->Vmax  - (1.0 / 2.0) * (pow(this->Amax, 2) / this->Jmax)) * dt - (1.0 / 6.0) * this->Jmax * pow(dt, 3) + (1.0 / 2.0) * this->Amax * pow(t, 2);
-        dist += this->d1 + this->d2;
-    } else if (t <= this->dt4) {
-        dt = t - this->dt1 - this->dt2 - this->dt3;
+    }
+    if ((t > T2) && (t <= T3)) {
+        dt = t - T2;
+        dist = (this->Vmax  - (1.0 / 2.0) * (pow(this->Amax, 2) / this->Jmax)) * dt - (1.0 / 6.0) * this->Jmax * pow(dt, 3) + (1.0 / 2.0) * this->Amax * pow(dt, 2);
+        dist += (this->d1 + this->d2);
+    }
+    if ((t > T3) && (t <= T4)) {
+        dt = t - T3;
         dist = this->Vmax * dt;
-        dist += this->d1 + this->d2 + this->d3;
-    } else if (t <= this->dt5) {
-        dt = t - this->dt1 - this->dt2 - this->dt3 - this->dt4;
+        dist += (this->d1 + this->d2 + this->d3);
+    }
+    if ((t > T4) && (t <= T5)) {
+        dt = t - T4;
         dist = this->Vmax * dt - (1.0 / 6.0) * this->Jmax * pow(dt, 3);
-        dist += this->d1 + this->d2 + this->d3 + this->d4;
-    } else if (t <= this->dt6) {
-        dt = t - this->dt1 - this->dt2 - this->dt3 - this->dt4 - this->dt5;
+        dist += (this->d1 + this->d2 + this->d3 + this->d4);
+    }
+    if ((t > T5) && (t <= T6)) {
+        dt = t - T5;
         dist = (this->Vmax - this->v1) * dt - (1.0 / 2.0) * this->Amax * pow(dt, 2);
-        dist += this->d1 + this->d2 + this->d3 + this->d4 + this->d5;
-    } else if (t <= this->dt7) {
-        dt = t - this->dt1 - this->dt2 - this->dt3 - this->dt4 - this->dt5 - this->dt6;
-        dist = (this->Vmax - this->v1) * dt - (1.0 / 2.0) * this->Amax * pow(dt, 2);
-        dist += this->d1 + this->d2 + this->d3 + this->d4 + this->d5 + this->d6;
-    } else if (t > this->dt7) {
+        dist += (this->d1 + this->d2 + this->d3 + this->d4 + this->d5);
+    }
+    if ((t > T6) && (t <= T7)) {
+        dt = t - T6;
+        dist = (1.0 / 6.0) * this->Jmax * pow(dt, 3) - (1.0 / 2.0) * this->Amax * pow(dt, 2) + (1.0 / 2.0) * this->Jmax * pow(T1, 2) * dt;
+        dist += (this->d1 + this->d2 + this->d3 + this->d4 + this->d5 + this->d6);
+    }
+    if (t > T7) {
         dist = this->d1 + this->d2 + this->d3 + this->d4 + this->d5 + this->d6 + this->d7;
     }
+
     return dist;
 }
 
@@ -100,7 +116,7 @@ ARCCode_t Trajectory_scurve::process(){
     this->d7 = this->d1;
     // Segment 4:
     this->d4 = (L/1000.0) - (this->dt1 + this->dt2 + this->dt3 + this->dt5 + this->dt6 + this->dt7);
-    this->dt4 = this->Vmax * this->d4;
+    this->dt4 = this->d4 / this->Vmax;
     this->v4 = this->Vmax;
     // Total time
     this->set_T(this->dt1 + this->dt2 + this->dt3 + this->dt4 + this->dt5 + this->dt6 + this->dt7);
