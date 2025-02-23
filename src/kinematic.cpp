@@ -179,10 +179,10 @@ void Kinematic::test(){
     {
         dist = trajectory_scurve->get_dist_at_t((double)i/1000.0);
         std::cout << "t: " << i/1000.0 << "; " << trajectory_scurve->get_dist_at_t((double)i/1000.0) << std::endl;
-        ret = path_linear->get_pose_at_s((dist / L), true, &pose);
+        ret = path_linear->get_pose_at_s((dist / (L/1000.0)), true, &pose);
         if ( ret == ARC_CODE_OK ) {
             //QDebug("pose: ");
-            std::cout << "pose: " << pose << std::endl;
+            std::cout << "\tpose: X=" << pose(0) << "; Y=" << pose(1) << "; Z=" << pose(2) << "; A=" << pose(3) << "; B=" << pose(4) << "; C=" << pose(5) << std::endl;
         }
         else
             std::cout << "Error: " << ret << std::endl;
