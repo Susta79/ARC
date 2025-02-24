@@ -1,7 +1,7 @@
 #include "trajectory.h"
 
-Trajectory::Trajectory(double Vmax, Path *path){
-    this->set_Vmax(Vmax);
+Trajectory::Trajectory(double V, Path *path){
+    this->set_V(V);
     this->path = path;
 };
 

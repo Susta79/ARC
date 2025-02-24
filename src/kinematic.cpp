@@ -168,24 +168,27 @@ void Kinematic::test(){
     Path_linear *path_linear = new Path_linear(P0, P1, euler0, euler1, N, dt);
     double L;
     path_linear->path_lenght(&L);
-    std::cout << "L: " << L << std::endl;
+    qDebug() << "L: " << L;
     Trajectory_scurve *trajectory_scurve = new Trajectory_scurve(2, 10, 100, path_linear);
     double T = trajectory_scurve->get_T();
-    std::cout << "T: " << T << std::endl;
+    qDebug() << "T: " << T;
     Eigen::Vector<double, 6> pose;
     double dist;
     ARCCode_t ret;
     for (size_t i = 0; i <= T*1000; i+=5)
     {
         dist = trajectory_scurve->get_dist_at_t((double)i/1000.0);
-        std::cout << "t: " << i/1000.0 << "; " << trajectory_scurve->get_dist_at_t((double)i/1000.0) << std::endl;
+        //std::cout << "t: " << i/1000.0 << "; " << dist << std::endl;
+        qDebug() << "t: " << i/1000.0 << "; " << dist;
         ret = path_linear->get_pose_at_s((dist / (L/1000.0)), true, &pose);
         if ( ret == ARC_CODE_OK ) {
-            //QDebug("pose: ");
-            std::cout << "\tpose: X=" << pose(0) << "; Y=" << pose(1) << "; Z=" << pose(2) << "; A=" << pose(3) << "; B=" << pose(4) << "; C=" << pose(5) << std::endl;
+            //std::cout << "\tpose: X=" << pose(0) << "; Y=" << pose(1) << "; Z=" << pose(2) << "; A=" << pose(3) << "; B=" << pose(4) << "; C=" << pose(5) << std::endl;
+            qDebug() << "\tpose: X=" << pose(0) << "; Y=" << pose(1) << "; Z=" << pose(2) << "; A=" << pose(3) << "; B=" << pose(4) << "; C=" << pose(5);
         }
-        else
-            std::cout << "Error: " << ret << std::endl;
+        else{
+            //std::cout << "Error: " << ret << std::endl;
+            qDebug() << "Error: " << ret;
+        }
     }
     
     delete robi;
