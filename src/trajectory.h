@@ -7,19 +7,19 @@
 class Trajectory {
 protected:
     // Max speed in m/s
-    double Vmax;
+    double V;
     // Calculated total traversing time in seconds 
     double T;
     // Path object. Can be any path type: lineat, circular, spline...
     Path *path;
 
 public:
-    Trajectory(double Vmax, Path *path);
+    Trajectory(double V, Path *path);
     ~Trajectory();
 
-    // Vmax
-    double get_Vmax(){ return this->Vmax; }
-    void set_Vmax(double Vmax){ if(Vmax > 0.001) this->Vmax = Vmax; else this->Vmax = 0.001; }
+    // V
+    double get_V(){ return this->V; }
+    void set_V(double V){ if(V > 0.000001) this->V = V; else this->V = 0.000001; }
 
     // T
     double get_T(){ return this->T; }

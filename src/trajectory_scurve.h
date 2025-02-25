@@ -4,51 +4,52 @@
 #include "global.h"
 #include "trajectory.h"
 #include "path.h"
+#include <QDebug>
 
 class Trajectory_scurve : public Trajectory {
     // S-Curve divided in 7 segments
 protected:
     // Max acceleration in m/s^2
-    double Amax;
+    double A;
     // Max jerk in m/s^3
-    double Jmax;
+    double J;
     // Delta time
-    double dt1;
-    double dt2;
-    double dt3;
-    double dt4;
-    double dt5;
-    double dt6;
-    double dt7;
+    double T1;
+    double T2;
+    double T3;
+    double T4;
+    double T5;
+    double T6;
+    double T7;
     // Distance
-    double d1;
-    double d2;
-    double d3;
-    double d4;
-    double d5;
-    double d6;
-    double d7;
+    double D1;
+    double D2;
+    double D3;
+    double D4;
+    double D5;
+    double D6;
+    double D7;
     // Speed at the end of each segment
-    double v1;
-    double v2;
-    double v3;
-    double v4;
-    double v5;
-    double v6;
-    double v7;
+    double V1;
+    double V2;
+    double V3;
+    double V4;
+    double V5;
+    double V6;
+    double V7;
 
 public:
-    Trajectory_scurve(double Vmax, double Amax, double Jmax, Path *path);
+    Trajectory_scurve(double V, double A, double J, Path *path);
     //~Trajectory_scurve();
     ARCCode_t process();
 
-    // Amax
-    double get_Amax(){ return this->Amax; }
-    void set_Amax(double Amax){ if (Amax > 0.1) this->Amax = Amax; else this->Amax = 0.1; }
+    // A
+    double get_A(){ return this->A; }
+    void set_A(double A){ if (A > 0.000001) this->A = A; else this->A = 0.000001; }
 
-    // Jmax
-    double get_Jmax(){ return this->Jmax; }
-    void set_Jmax(double Jmax){ if (Jmax > 0.1) this->Jmax = Jmax; else this->Jmax = 0.1; }
+    // J
+    double get_J(){ return this->J; }
+    void set_J(double J){ if (J > 0.000001) this->J = J; else this->J = 0.000001; }
 
     // virtual functions
     double get_dist_at_t(double t);

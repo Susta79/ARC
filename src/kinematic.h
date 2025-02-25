@@ -12,6 +12,7 @@
 #include <QWidget>
 #include <QFormLayout>
 #include <QPushButton>
+#include <QDebug>
 
 class Kinematic : public QDialog {
 private:
