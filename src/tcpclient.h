@@ -1,7 +1,24 @@
 #ifndef TCPCLIENT_H
 #define TCPCLIENT_H
 
-#include "error_def.h"
+#include "joint.h"
+#include "ARC/error_def.h"
+
+#include <QObject>
+#include <QTcpSocket>
+#include <QPushButton>
+#include <QLineEdit>
+#include <QSpinBox>
+#include <QTimer>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QTextStream>
+#include <QDebug>
+#include <QWidget>
+
+/*
+#include "include/ARC/error_def.h"
 #include "joint.h"
 
 #include <QObject>
@@ -11,6 +28,8 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QSpinBox>
+*/
+
 #include <Eigen/Dense>
 
 using namespace Eigen;
@@ -41,6 +60,8 @@ private:
     QTimer* tmr;
     ARCCode_t Connect(QString IP, int Port);
     ARCCode_t Disconnect();
+    std::string format_joints_string_deg(Array<double, 6, 1>);
+    Array<double, 6, 1> parse_joints_string_deg(std::string);
 };
 
 #endif // TCPCLIENT_H

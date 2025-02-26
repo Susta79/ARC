@@ -1,11 +1,6 @@
 #include "mainwindow.h"
 #include "kinematic.h"
 
-#include <QMainWindow>
-#include <QWidget>
-#include <QFormLayout>
-#include <QHBoxLayout>
-
 #define VERSION "1.1.0"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
@@ -46,6 +41,10 @@ MainWindow::~MainWindow()
    if (pKinematic) {
       delete pKinematic;
       pKinematic = nullptr;
+   }
+   if (pTcpClient) {
+      delete pTcpClient;
+      pTcpClient = nullptr;
    }
 }
 
