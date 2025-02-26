@@ -162,28 +162,34 @@ void Kinematic::test(){
     Eigen::Vector3d P1(x1, y1, z1);
     Eigen::Vector3d euler0(a0, b0, c0);
     Eigen::Vector3d euler1(a1, b1, c1);
-    euler0 *= DEG_TO_RAD;
-    euler1 *= DEG_TO_RAD;
 
-    Path_linear *path_linear = new Path_linear(P0, P1, euler0, euler1, N, dt);
+    Path_linear *path_linear = new Path_linear(P0, P1, euler0, euler1, N, dt, true, false);
     double L;
-    path_linear->path_lenght(&L);
+    path_linear->path_lenght(&L, false);
     qDebug() << "L: " << L;
     Trajectory_scurve *trajectory_scurve = new Trajectory_scurve(2, 10, 100, path_linear);
     double T = trajectory_scurve->get_T();
     qDebug() << "T: " << T;
     Eigen::Vector<double, 6> pose;
+    Eigen::Vector<double, 6> joint;
     double dist;
     ARCCode_t ret;
     for (size_t i = 0; i <= T*1000; i+=5)
     {
-        dist = trajectory_scurve->get_dist_at_t((double)i/1000.0);
+        dist = trajectory_scurve->get_dist_at_t((double)i/1000.0, false);
         //std::cout << "t: " << i/1000.0 << "; " << dist << std::endl;
         qDebug() << "t: " << i/1000.0 << "; " << dist;
-        ret = path_linear->get_pose_at_s((dist / (L/1000.0)), true, &pose);
+        ret = path_linear->get_pose_at_s((dist / L), false, false, &pose);
         if ( ret == ARC_CODE_OK ) {
             //std::cout << "\tpose: X=" << pose(0) << "; Y=" << pose(1) << "; Z=" << pose(2) << "; A=" << pose(3) << "; B=" << pose(4) << "; C=" << pose(5) << std::endl;
             qDebug() << "\tpose: X=" << pose(0) << "; Y=" << pose(1) << "; Z=" << pose(2) << "; A=" << pose(3) << "; B=" << pose(4) << "; C=" << pose(5);
+            ret = robi->inv_kin(pose, true, true, false, false, &joint);
+            if ( ret == ARC_CODE_OK ) {
+                qDebug() << "\t\tjoint: J1=" << joint(0) << "; J2=" << joint(1) << "; J3=" << joint(2) << "; J4=" << joint(3) << "; J5=" << joint(4) << "; J6=" << joint(5);
+            }
+            else{
+                qDebug() << "Error: " << ret;
+            }
         }
         else{
             //std::cout << "Error: " << ret << std::endl;

@@ -1,8 +1,11 @@
 #include "path_linear.h"
 
-ARCCode_t Path_linear::path_lenght(double *lenght)
+ARCCode_t Path_linear::path_lenght(double *lenght, bool out_mm)
 {
-    *lenght = (this->P1 - this->P0).norm();
+    if (out_mm == false)
+        *lenght = (this->P1 - this->P0).norm()/1000.0;
+    else
+        *lenght = (this->P1 - this->P0).norm();
     return ARC_CODE_OK;
 }
 
@@ -48,15 +51,15 @@ Eigen::Vector3d Path_linear::path_lambda(Eigen::Vector3d P0, Eigen::Vector3d P1,
     return P0*(1-s)+ P1*s;
 }
 
-ARCCode_t Path_linear::get_pose_at_s(double s, bool out_rads, Eigen::Vector<double, 6> *pose){
+ARCCode_t Path_linear::get_pose_at_s(double s, bool out_mm, bool out_rads, Eigen::Vector<double, 6> *pose){
     Eigen::Quaterniond q0, q1, qSlerp;
     Eigen::Vector3d P, euler;
     Eigen::Matrix3d R, R0, R1;
 
     P = this->P0*(1-s)+ this->P1*s;
 
-    R0 = rot_mat_from_euler(this->euler0, true);
-    R1 = rot_mat_from_euler(this->euler1, true);
+    R0 = rot_mat_from_euler(this->euler0, false);
+    R1 = rot_mat_from_euler(this->euler1, false);
 
     q0 = q_from_rot_mat(R0);
     q1 = q_from_rot_mat(R1);
@@ -65,8 +68,11 @@ ARCCode_t Path_linear::get_pose_at_s(double s, bool out_rads, Eigen::Vector<doub
     R = rot_mat_from_q(qSlerp);
     euler = euler_from_rot_mat(R, out_rads);
 
-    if (out_rads == false)
-        euler *= RAD_TO_DEG;
+    if (out_mm == false)
+        P /= 1000.0;
+
+    //if (out_rads == false)
+    //    euler *= RAD_TO_DEG;
     
     *pose << P, euler;
 

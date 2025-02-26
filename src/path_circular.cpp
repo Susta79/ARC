@@ -1,6 +1,6 @@
 #include "path_circular.h"
 
-Path_circular::Path_circular(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, Eigen::Vector3d euler0, Eigen::Vector3d euler1, Eigen::Vector3d euler2, double N, double dt) : Path (P0, P1, euler0, euler1, N, dt){
+Path_circular::Path_circular(Eigen::Vector3d P0, Eigen::Vector3d P1, Eigen::Vector3d P2, Eigen::Vector3d euler0, Eigen::Vector3d euler1, Eigen::Vector3d euler2, double N, double dt, bool in_mm, bool in_rads) : Path (P0, P1, euler0, euler1, N, dt, in_mm, in_rads){
     Eigen::Vector3d v01, v12, NN, vc0, vc1, vc2, cross1;
     this->P2 = P2;
     this->euler2 = euler2;
@@ -144,15 +144,21 @@ Eigen::Vector3d Path_circular::circular_path_lambda(Eigen::Vector3d CC, double C
 
 
 
-ARCCode_t Path_circular::path_lenght(double *arc_lenght){
+ARCCode_t Path_circular::path_lenght(double *arc_lenght, bool out_mm){
     double CR, alpha;
     ARCCode_t ret;
     CR = this->circumradius();
     ret = this->circum_alpha(P0, P1, P2, &alpha);
-    if (ret == ARC_CODE_OK)
-        *arc_lenght = CR * alpha;
-    else
+    if (ret == ARC_CODE_OK){
+        if (out_mm == false)
+            *arc_lenght = CR * alpha / 1000.0;
+        else
+            *arc_lenght = CR * alpha;
+    }
+    else{
         *arc_lenght = 0.0;
+    }
+    
     return ret;
 }
 

@@ -128,7 +128,7 @@ ARCCode_t Robi::sd_limits_J(Eigen::ArrayXd s_array, Eigen::ArrayXd speed_limits,
 }
 */
 
-ARCCode_t Robi::for_kin(Eigen::Array<double, 6, 1> angles, bool in_rads, bool out_rads, Eigen::Array<double, 6, 1> *xyzabc, Eigen::Affine3d *t16){
+ARCCode_t Robi::for_kin(Eigen::Vector<double, 6> angles, bool in_rads, bool out_rads, Eigen::Vector<double, 6> *xyzabc, Eigen::Affine3d *t16){
     Eigen::Vector3d trans1, trans2, trans3, trans4, trans5, trans6, xyz, abc;
     Eigen::Matrix3d rot1, rot2, rot3, rot4, rot5, rot6, r16;
     Eigen::Affine3d t1, t2, t3, t4, t5, t6;
@@ -140,22 +140,19 @@ ARCCode_t Robi::for_kin(Eigen::Array<double, 6, 1> angles, bool in_rads, bool ou
     trans5 << this->a5x, 0, 0;
     trans6 << this->a6x, 0, 0;
 
-    if (in_rads == false)
-        angles *= DEG_TO_RAD;
+    rot1 = rotz(angles[0], in_rads);
+    rot2 = roty(angles[1], in_rads);
+    rot3 = roty(angles[2], in_rads);
+    rot4 = rotx(angles[3], in_rads);
+    rot5 = roty(angles[4], in_rads);
+    rot6 = rotx(angles[5], in_rads);
 
-    rot1 = rotz(angles[0]);
-    rot2 = roty(angles[1]);
-    rot3 = roty(angles[2]);
-    rot4 = rotx(angles[3]);
-    rot5 = roty(angles[4]);
-    rot6 = rotx(angles[5]);
-
-    t1 = trans_mat(rot1, trans1);
-    t2 = trans_mat(rot2, trans2);
-    t3 = trans_mat(rot3, trans3);
-    t4 = trans_mat(rot4, trans4);
-    t5 = trans_mat(rot5, trans5);
-    t6 = trans_mat(rot6, trans6);
+    t1 = trans_mat(rot1, trans1, true);
+    t2 = trans_mat(rot2, trans2, true);
+    t3 = trans_mat(rot3, trans3, true);
+    t4 = trans_mat(rot4, trans4, true);
+    t5 = trans_mat(rot5, trans5, true);
+    t6 = trans_mat(rot6, trans6, true);
 
     // Combined transformation: from Frame 6 to Frame 1
     *t16 = t1 * t2 * t3 * t4 * t5 * t6;
@@ -177,7 +174,7 @@ ARCCode_t Robi::for_kin(Eigen::Array<double, 6, 1> angles, bool in_rads, bool ou
    return ARC_CODE_OK;
 }
 
-ARCCode_t Robi::inv_kin(Eigen::Array<double, 6, 1> xyzabc, bool front_pose, bool up_pose, bool in_rads, bool out_rads, Eigen::Array<double, 6, 1> *joint){
+ARCCode_t Robi::inv_kin(Eigen::Vector<double, 6> xyzabc, bool front_pose, bool up_pose, bool in_rads, bool out_rads, Eigen::Vector<double, 6> *joint){
     double x, y, z, a, b, c, j1, j2, j3, j4, j5, j6;
     double WPxy, l, h, ro, b4x, alpha, cosbeta, beta, cosgamma, gamma, delta;
     Eigen::Vector3d TCPxyz, x_hat, WP;
@@ -189,14 +186,9 @@ ARCCode_t Robi::inv_kin(Eigen::Array<double, 6, 1> xyzabc, bool front_pose, bool
     a = xyzabc(3);
     b = xyzabc(4);
     c = xyzabc(5);
-    if (in_rads == false){
-        a *= DEG_TO_RAD;
-        b *= DEG_TO_RAD;
-        c *= DEG_TO_RAD;
-    }
 
     TCPxyz << x, y, z;
-    R = rotz(c) * roty(b) *rotx(a);
+    R = rotz(c, in_rads) * roty(b, in_rads) *rotx(a, in_rads);
 
     // x_hat = R[:,0]
     x_hat = R * Eigen::Vector3d::UnitX();
@@ -252,7 +244,7 @@ ARCCode_t Robi::inv_kin(Eigen::Array<double, 6, 1> xyzabc, bool front_pose, bool
         }
     }
 
-    Rarm = rotz(j1) * roty(j2+j3);
+    Rarm = rotz(j1, true) * roty(j2+j3, true);
     Rwrist = Rarm.transpose() * R;
 
     j4 = atan2(Rwrist(1,0),-Rwrist(2,0));
@@ -267,7 +259,7 @@ ARCCode_t Robi::inv_kin(Eigen::Array<double, 6, 1> xyzabc, bool front_pose, bool
     return ARC_CODE_OK;
 }
 
-ARCCode_t Robi::Jacobian(Eigen::Array<double, 6, 1> thetas, bool in_rads, Eigen::Matrix<double, 6, 6> *J){
+ARCCode_t Robi::Jacobian(Eigen::Vector<double, 6> thetas, bool in_rads, Eigen::Matrix<double, 6, 6> *J){
     double j1, j2, j3, j4, j5, j6;
     j1 = thetas[0];
     j2 = thetas[1];

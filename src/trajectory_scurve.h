@@ -52,7 +52,7 @@ public:
     void set_J(double J){ if (J > 0.000001) this->J = J; else this->J = 0.000001; }
 
     // virtual functions
-    double get_dist_at_t(double t);
+    double get_dist_at_t(double t, bool out_mm);
 };
 
 #endif // TRAJECTORY_SCURVE_H

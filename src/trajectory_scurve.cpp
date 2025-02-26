@@ -31,7 +31,7 @@ Trajectory_scurve::Trajectory_scurve(double V, double A, double J, Path *path) :
     ret = this->process();
 }
 
-double Trajectory_scurve::get_dist_at_t(double t){
+double Trajectory_scurve::get_dist_at_t(double t, bool out_mm){
     double dist, dt;
     double T01 = this->T1;
     double T02 = T01 + this->T2;
@@ -81,13 +81,17 @@ double Trajectory_scurve::get_dist_at_t(double t){
         dist = this->D1 + this->D2 + this->D3 + this->D4 + this->D5 + this->D6 + this->D7;
     }
 
+    if (out_mm)
+        dist *= 1000.0;
+
     return dist;
 }
 
 ARCCode_t Trajectory_scurve::process(){
     ARCCode_t ret;
     double L;
-    ret = this->path->path_lenght(&L);
+    // get path lenght in m
+    ret = this->path->path_lenght(&L, false);
     if (ret != ARC_CODE_OK)
         return ret;
     // Segment 1: Jerk positive constant
@@ -115,7 +119,7 @@ ARCCode_t Trajectory_scurve::process(){
     this->V7 = 0;
     this->D7 = this->D1;
     // Segment 4:
-    this->D4 = (L/1000.0) - (this->T1 + this->T2 + this->T3 + this->T5 + this->T6 + this->T7);
+    this->D4 = L - (this->T1 + this->T2 + this->T3 + this->T5 + this->T6 + this->T7);
     this->T4 = this->D4 / this->V;
     this->V4 = this->V;
     // Total time
@@ -142,26 +146,6 @@ ARCCode_t Trajectory_scurve::process(){
     qDebug() << "V5: " << this->V5;
     qDebug() << "V6: " << this->V6;
     qDebug() << "V7: " << this->V7;
-    //std::cout << "T1: " << this->T1 << std::endl;
-    //std::cout << "T2: " << this->T2 << std::endl;
-    //std::cout << "T3: " << this->T3 << std::endl;
-    //std::cout << "T4: " << this->T4 << std::endl;
-    //std::cout << "T5: " << this->T5 << std::endl;
-    //std::cout << "T6: " << this->T6 << std::endl;
-    //std::cout << "T7: " << this->T7 << std::endl;
-    //std::cout << "D1: " << this->D1 << std::endl;
-    //std::cout << "D2: " << this->D2 << std::endl;
-    //std::cout << "D3: " << this->D3 << std::endl;
-    //std::cout << "D4: " << this->D4 << std::endl;
-    //std::cout << "D5: " << this->D5 << std::endl;
-    //std::cout << "D6: " << this->D6 << std::endl;
-    //std::cout << "D7: " << this->D7 << std::endl;
-    //std::cout << "V1: " << this->V1 << std::endl;
-    //std::cout << "V2: " << this->V2 << std::endl;
-    //std::cout << "V3: " << this->V3 << std::endl;
-    //std::cout << "V4: " << this->V4 << std::endl;
-    //std::cout << "V5: " << this->V5 << std::endl;
-    //std::cout << "V6: " << this->V6 << std::endl;
-    //std::cout << "V7: " << this->V7 << std::endl;
+
     return ARC_CODE_OK;
 }
