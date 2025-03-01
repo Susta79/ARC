@@ -147,12 +147,12 @@ ARCCode_t Robi::for_kin(Eigen::Vector<double, 6> angles, bool in_rads, bool out_
     rot5 = roty(angles[4], in_rads);
     rot6 = rotx(angles[5], in_rads);
 
-    t1 = trans_mat(rot1, trans1, true);
-    t2 = trans_mat(rot2, trans2, true);
-    t3 = trans_mat(rot3, trans3, true);
-    t4 = trans_mat(rot4, trans4, true);
-    t5 = trans_mat(rot5, trans5, true);
-    t6 = trans_mat(rot6, trans6, true);
+    t1 = trans_mat(rot1, trans1);
+    t2 = trans_mat(rot2, trans2);
+    t3 = trans_mat(rot3, trans3);
+    t4 = trans_mat(rot4, trans4);
+    t5 = trans_mat(rot5, trans5);
+    t6 = trans_mat(rot6, trans6);
 
     // Combined transformation: from Frame 6 to Frame 1
     *t16 = t1 * t2 * t3 * t4 * t5 * t6;

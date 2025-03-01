@@ -44,7 +44,7 @@ inline Eigen::Matrix3d rotz(double angle, bool in_rads){
     return R;
 }
 
-inline Eigen::Affine3d trans_mat(Eigen::Matrix3d rot, Eigen::Vector3d trans, bool in_mm){
+inline Eigen::Affine3d trans_mat(Eigen::Matrix3d rot, Eigen::Vector3d trans){
     Eigen::Affine3d T;
     T.linear() = rot;
     T.translation() = trans;
