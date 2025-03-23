@@ -1,5 +1,5 @@
 if (APPLE)
-    set(QT6_DIR ~/Qt/6.8.1/macos)
+    set(QT6_DIR ~/Qt/6.8.2/macos)
 elseif (WIN32)
     set(QT6_DIR c:/Qt/6.8.1/mingw_64)
 endif()

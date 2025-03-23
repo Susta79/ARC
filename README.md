@@ -1,6 +1,8 @@
 # ARC
 A Robot Controller
 
+
+
 ## Angles
 Tait-Bryan angles:
 
@@ -15,6 +17,12 @@ This is obsolet:
     To use Qt:
     Set the CMake tools extension "Configure Args" to -DCMAKE_PREFIX_PATH=C:/Qt/5.15.2/msvc2019_64
 
+## Install CMake
+To compile this program you need CMake.
+
+### macos
+https://gist.github.com/fscm/29fd23093221cf4d96ccfaac5a1a5c90
+
 
 ## Install Eigen
 
@@ -25,12 +33,12 @@ Set the CMake tools extension "Configure Args" to -DEigen3_DIR=C:/dev/vcpkg/pack
 
 You can also install Eigen with Chocolatey: choco install eigen
 
-
 ### macos
 After installing Homebrew, run the following command:
-brew install eigen
+
 at the end you will get the path where eigen is installed. In my case:
 /usr/local/Cellar/eigen/3.4.0_1
+
 
 ## Troubleshooting
 
